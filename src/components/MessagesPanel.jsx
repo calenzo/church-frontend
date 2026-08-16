@@ -17,7 +17,46 @@ function formatDate(value) {
     month: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
+    second: '2-digit',
   })
+}
+
+function parseSteps(raw) {
+  try {
+    const arr = JSON.parse(raw || '[]')
+    return Array.isArray(arr) ? arr : []
+  } catch {
+    return []
+  }
+}
+
+function StepsTimeline({ steps }) {
+  if (!steps.length) return null
+  return (
+    <div className="mt-3 space-y-0">
+      {steps.map((s, i) => (
+        <div key={i} className="flex gap-2">
+          <div className="flex flex-col items-center">
+            <span
+              className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
+                s.status === 'error' ? 'bg-red-500' : 'bg-emerald-500'
+              }`}
+            />
+            {i < steps.length - 1 && <span className="w-px flex-1 bg-slate-200" />}
+          </div>
+          <div className="min-w-0 pb-2">
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <span className={`text-xs font-medium ${s.status === 'error' ? 'text-red-700' : 'text-slate-600'}`}>
+                {s.step}
+              </span>
+              <span className="text-[10px] text-slate-400">{formatDate(s.ts)}</span>
+            </div>
+            {s.detail && <p className="text-xs text-slate-500">{s.detail}</p>}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
 }
 
 export default function MessagesPanel({ reloadKey }) {
@@ -95,7 +134,13 @@ export default function MessagesPanel({ reloadKey }) {
                     <p className="text-sm text-slate-600">{m.llm_reply}</p>
                   </div>
                 )}
-                {m.error && <p className="mt-2 text-xs text-red-500">{m.error}</p>}
+                {m.error && (
+                  <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+                    <span className="font-medium uppercase tracking-wide">Erro: </span>
+                    {m.error}
+                  </p>
+                )}
+                <StepsTimeline steps={parseSteps(m.steps)} />
               </div>
             </div>
           ))}
