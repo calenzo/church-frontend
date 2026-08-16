@@ -72,19 +72,19 @@ export default function ConfigPanel() {
       </section>
 
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-1 text-base font-semibold text-slate-900">LLM (Ollama)</h2>
+        <h2 className="mb-1 text-base font-semibold text-slate-900">LLM</h2>
         <p className="mb-4 text-sm text-slate-500">
-          Qualquer API compativel com OpenAI funciona aqui.
+          Qualquer API compativel com OpenAI funciona aqui (online, ex.: OpenAI, Groq, Mistral).
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="URL base" hint="Ex.: http://localhost:11434">
-            <input className={inputCls} value={form.base_url} onChange={set('base_url')} placeholder="http://localhost:11434" />
+          <Field label="URL base" hint="Ex.: https://api.openai.com/v1">
+            <input className={inputCls} value={form.base_url} onChange={set('base_url')} placeholder="https://api.openai.com/v1" />
           </Field>
-          <Field label="Modelo" hint="Ex.: llama3.1, gemma2, mistral">
-            <input className={inputCls} value={form.model} onChange={set('model')} placeholder="llama3.1" />
+          <Field label="Modelo" hint="Ex.: gpt-4o-mini, llama3.1, mistral">
+            <input className={inputCls} value={form.model} onChange={set('model')} placeholder="gpt-4o-mini" />
           </Field>
-          <Field label="API key (opcional)">
-            <input className={inputCls} type="password" value={form.api_key} onChange={set('api_key')} placeholder="vazio se usar Ollama local" />
+          <Field label="API key (obrigatoria para LLM online)">
+            <input className={inputCls} type="password" value={form.api_key} onChange={set('api_key')} placeholder="sk-..." />
           </Field>
           <Field label="Temperatura">
             <input className={inputCls} type="number" min="0" max="2" step="0.1" value={form.temperature} onChange={set('temperature')} />

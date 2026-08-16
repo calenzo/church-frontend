@@ -1,4 +1,6 @@
-const API = '/api'
+const API = import.meta.env.PROD
+  ? 'https://church-backend-vzzp.onrender.com/api'
+  : '/api'
 
 async function request(path, options = {}) {
   const res = await fetch(`${API}${path}`, {

@@ -59,7 +59,7 @@ export default function App() {
           <div className="flex flex-wrap justify-end gap-2">
             {status && (
               <>
-                <StatusDot label="Ollama" value={status.ollama} />
+                <StatusDot label="LLM" value={status.llm} />
                 <StatusDot label="WhatsApp" value={status.evolution} />
               </>
             )}
