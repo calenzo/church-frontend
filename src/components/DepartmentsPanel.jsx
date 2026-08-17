@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { api } from '../api.js'
 
 const inputCls =
@@ -9,6 +9,11 @@ const emptyForm = { name: '', description: '', group_name: '', group_jid: '', ac
 export default function DepartmentsPanel() {
   const [departments, setDepartments] = useState([])
   const [groups, setGroups] = useState([])
+  const [groupsLoading, setGroupsLoading] = useState(true)
+  const [groupsErr, setGroupsErr] = useState(null)
+  const [groupSearch, setGroupSearch] = useState('')
+  const [groupOpen, setGroupOpen] = useState(false)
+  const groupRef = useRef(null)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState(emptyForm)
   const [loading, setLoading] = useState(true)
@@ -31,17 +36,53 @@ export default function DepartmentsPanel() {
     load()
   }, [])
 
+  const loadGroups = async (retries = 3, forceRefresh = false) => {
+    setGroupsLoading(true)
+    setGroupsErr(null)
+    for (let i = 0; i < retries; i++) {
+      try {
+        setGroups(await api.getGroups(forceRefresh))
+        setGroupsErr(null)
+        return
+      } catch (e) {
+        if (i < retries - 1) await new Promise((r) => setTimeout(r, 3000 * (i + 1)))
+        else setGroupsErr(e.message)
+      } finally {
+        if (i === retries - 1) setGroupsLoading(false)
+      }
+    }
+  }
+
   useEffect(() => {
-    api.getGroups().then(setGroups).catch(() => setGroups([]))
+    loadGroups()
+  }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (groupRef.current && !groupRef.current.contains(e.target)) setGroupOpen(false)
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   const set = (field) => (e) => setForm({ ...form, [field]: e.target.value })
 
-  const setJid = (e) => {
-    const id = e.target.value
-    const g = groups.find((x) => x.id === id)
-    setForm({ ...form, group_jid: id, group_name: g ? g.subject : form.group_name })
+  const filteredGroups = groups.filter((g) =>
+    (g.subject || '').toLowerCase().includes(groupSearch.toLowerCase()),
+  )
+
+  const selectGroup = (g) => {
+    setForm({ ...form, group_jid: g.id, group_name: g.subject })
+    setGroupSearch('')
+    setGroupOpen(false)
   }
+
+  const clearGroup = () => {
+    setForm({ ...form, group_jid: '', group_name: '' })
+    setGroupSearch('')
+  }
+
+  const selectedGroup = groups.find((g) => g.id === form.group_jid)
 
   const startEdit = (dep) => {
     setEditing(dep.id)
@@ -131,17 +172,83 @@ export default function DepartmentsPanel() {
                 <label className="mb-1 block text-sm font-medium text-slate-700">Descricao (ajuda a LLM a classificar)</label>
                 <input className={inputCls} value={form.description} onChange={set('description')} placeholder="Ex.: Equipe de musica, instrumentos e ministerio" />
               </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Grupo do WhatsApp</label>
-                <select className={inputCls} value={form.group_jid} onChange={setJid}>
-                  <option value="">— Selecione um grupo —</option>
-                  {groups.map((g) => (
-                    <option key={g.id} value={g.id}>
-                      {g.subject}
-                    </option>
-                  ))}
-                </select>
-                {form.group_name && (
+              <div className="relative" ref={groupRef}>
+                <div className="mb-1 flex items-center justify-between">
+                  <label className="text-sm font-medium text-slate-700">Grupo do WhatsApp</label>
+                  <button
+                    type="button"
+                    onClick={() => loadGroups(1, true)}
+                    disabled={groupsLoading}
+                    className="text-xs text-blue-500 hover:underline disabled:opacity-40"
+                  >
+                    {groupsLoading ? 'Atualizando...' : 'Atualizar lista'}
+                  </button>
+                </div>
+
+                {selectedGroup ? (
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900">
+                      {selectedGroup.subject}
+                      <span className="ml-2 text-xs text-slate-400">{selectedGroup.id}</span>
+                    </div>
+                    <button type="button" onClick={clearGroup} className="text-xs text-red-500 hover:underline">
+                      Limpar
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      className={inputCls}
+                      placeholder={
+                        groupsLoading
+                          ? 'Carregando grupos...'
+                          : 'Pesquisar grupo...'
+                      }
+                      value={groupSearch}
+                      onChange={(e) => {
+                        setGroupSearch(e.target.value)
+                        setGroupOpen(true)
+                      }}
+                      onFocus={() => setGroupOpen(true)}
+                      disabled={groupsLoading}
+                    />
+                    {groupOpen && (
+                      <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+                        {groupsLoading && (
+                          <li className="px-3 py-2 text-sm text-slate-400">Carregando...</li>
+                        )}
+                        {!groupsLoading && filteredGroups.length === 0 && (
+                          <li className="px-3 py-2 text-sm text-slate-400">
+                            {groupSearch ? 'Nenhum grupo encontrado' : 'Nenhum grupo disponivel'}
+                          </li>
+                        )}
+                        {filteredGroups.map((g) => (
+                          <li
+                            key={g.id}
+                            className="cursor-pointer px-3 py-2 text-sm hover:bg-blue-50"
+                            onClick={() => selectGroup(g)}
+                          >
+                            <div className="font-medium text-slate-900">{g.subject}</div>
+                            <div className="text-xs text-slate-400">{g.id}</div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                )}
+
+                {groupsErr && (
+                  <div className="mt-1 flex items-center gap-2 text-xs text-red-600">
+                    <span>Falha ao carregar grupos: {groupsErr}</span>
+                    <button type="button" onClick={() => loadGroups()} className="font-medium underline hover:no-underline">
+                      Tentar novamente
+                    </button>
+                  </div>
+                )}
+                {!groupsErr && !groupsLoading && groups.length === 0 && (
+                  <p className="mt-1 text-xs text-slate-400">Nenhum grupo encontrado. Verifique se a instancia esta conectada.</p>
+                )}
+                {form.group_name && selectedGroup && (
                   <span className="mt-1 block text-xs text-slate-400">
                     Grupo vinculado: <span className="font-medium text-slate-600">{form.group_name}</span>
                   </span>

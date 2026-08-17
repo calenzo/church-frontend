@@ -34,5 +34,6 @@ export const api = {
   getMessages: (limit = 100) => request(`/messages?limit=${limit}`),
   getStatus: () => request('/status'),
   getQrCode: () => request('/evolution/qrcode'),
-  getGroups: () => request('/evolution/groups'),
+  getGroups: (refresh = false) => request(`/evolution/groups${refresh ? '?refresh=true' : ''}`),
+  getEvolutionDebug: () => request('/evolution/debug'),
 }
