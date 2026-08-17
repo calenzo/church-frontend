@@ -43,14 +43,13 @@ export default function DepartmentsPanel() {
       try {
         setGroups(await api.getGroups(forceRefresh))
         setGroupsErr(null)
-        return
+        break
       } catch (e) {
         if (i < retries - 1) await new Promise((r) => setTimeout(r, 3000 * (i + 1)))
         else setGroupsErr(e.message)
-      } finally {
-        if (i === retries - 1) setGroupsLoading(false)
       }
     }
+    setGroupsLoading(false)
   }
 
   useEffect(() => {
