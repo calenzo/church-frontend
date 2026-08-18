@@ -66,7 +66,7 @@ export default function ConfigPanel() {
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-base font-semibold text-slate-900">Contato principal da igreja</h2>
         <p className="mb-4 text-sm text-slate-500">
-          O WhatsApp e conectado pelo QR code abaixo, em Ajustes &gt; Aparelhos conectados &gt; Conectar aparelho.
+          Conecte o WhatsApp escaneando o QR code ou usando o codigo de pareamento por telefone.
         </p>
         <QrPanel />
       </section>
