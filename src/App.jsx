@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { api } from './api.js'
 import ConfigPanel from './components/ConfigPanel.jsx'
 import DepartmentsPanel from './components/DepartmentsPanel.jsx'
+import LandingPage from './components/LandingPage.jsx'
 import MessagesPanel from './components/MessagesPanel.jsx'
 
 const TABS = [
@@ -26,6 +28,17 @@ function StatusDot({ label, value }) {
 }
 
 export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+function AdminDashboard() {
   const [tab, setTab] = useState('config')
   const [status, setStatus] = useState(null)
   const [reloadKey, setReloadKey] = useState(0)
