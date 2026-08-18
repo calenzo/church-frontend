@@ -79,7 +79,7 @@ export default function QrPanel() {
   return (
     <div>
       <ModeTabs mode={mode} setMode={setMode} />
-      <PairingForm />
+      <PairingForm onQrFallback={(qr) => { setQr(qr); setMode('qr') }} />
     </div>
   )
 }
@@ -97,7 +97,7 @@ function ModeTabs({ mode, setMode }) {
   )
 }
 
-function PairingForm() {
+function PairingForm({ onQrFallback }) {
   const [phone, setPhone] = useState('')
   const [code, setCode] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -116,6 +116,8 @@ function PairingForm() {
       const res = await api.getPairingCode(digits)
       if (res.pairingCode) {
         setCode(res.pairingCode)
+      } else if (res.qrcode && onQrFallback) {
+        onQrFallback(res.qrcode)
       } else {
         setErr('Nao foi possivel gerar o codigo de pareamento. Tente novamente ou use o QR Code para conectar.')
       }
