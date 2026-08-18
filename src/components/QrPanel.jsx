@@ -10,6 +10,7 @@ const tabCls = (active) =>
 
 export default function QrPanel() {
   const [mode, setMode] = useState('qr')
+  const [connected, setConnected] = useState(false)
   const [qr, setQr] = useState(null)
   const [err, setErr] = useState(null)
   const hasQr = useRef(false)
@@ -17,8 +18,15 @@ export default function QrPanel() {
   const loadQr = async () => {
     try {
       const res = await api.getQrCode()
-      setQr(res.qrcode)
-      hasQr.current = Boolean(res.qrcode)
+      if (res.qrcode) {
+        setQr(res.qrcode)
+        hasQr.current = true
+        setConnected(false)
+      } else {
+        setQr(null)
+        hasQr.current = false
+        setConnected(true)
+      }
       setErr(null)
     } catch (e) {
       setErr(e.message)
@@ -35,11 +43,7 @@ export default function QrPanel() {
     }
   }, [mode])
 
-  if (err && mode === 'qr') {
-    return <p className="text-sm text-red-700">Nao foi possivel obter o QR code: {err}</p>
-  }
-
-  if (!qr && mode === 'qr') {
+  if (connected) {
     return (
       <div>
         <ModeTabs mode={mode} setMode={setMode} />
@@ -55,11 +59,19 @@ export default function QrPanel() {
     return (
       <div>
         <ModeTabs mode={mode} setMode={setMode} />
-        <p className="mt-4 mb-3 text-sm text-slate-500">
-          Escaneie o QR code abaixo com o WhatsApp (Ajustes &gt; Aparelhos conectados &gt; Conectar aparelho) para parear o numero da igreja.
-        </p>
-        <img src={qr} alt="QR code para conectar o WhatsApp" className="h-56 w-56 rounded-lg border border-slate-200" />
-        <p className="mt-3 text-xs text-slate-400">Atualiza automaticamente a cada 5 segundos.</p>
+        {err && <p className="mt-3 text-sm text-red-700">Nao foi possivel obter o QR code: {err}</p>}
+        {!qr && !err && (
+          <p className="mt-4 text-sm text-slate-400">Carregando QR code...</p>
+        )}
+        {qr && (
+          <>
+            <p className="mt-4 mb-3 text-sm text-slate-500">
+              Escaneie o QR code abaixo com o WhatsApp (Ajustes &gt; Aparelhos conectados &gt; Conectar aparelho) para parear o numero da igreja.
+            </p>
+            <img src={qr} alt="QR code para conectar o WhatsApp" className="h-56 w-56 rounded-lg border border-slate-200" />
+            <p className="mt-3 text-xs text-slate-400">Atualiza automaticamente a cada 5 segundos.</p>
+          </>
+        )}
       </div>
     )
   }
@@ -102,7 +114,11 @@ function PairingForm() {
     setCode(null)
     try {
       const res = await api.getPairingCode(digits)
-      setCode(res.pairingCode)
+      if (res.pairingCode) {
+        setCode(res.pairingCode)
+      } else {
+        setErr('Nao foi possivel gerar o codigo. Verifique se a instancia esta conectada e tente novamente.')
+      }
     } catch (e) {
       setErr(e.message)
     } finally {
