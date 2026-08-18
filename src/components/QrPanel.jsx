@@ -117,7 +117,7 @@ function PairingForm() {
       if (res.pairingCode) {
         setCode(res.pairingCode)
       } else {
-        setErr('Nao foi possivel gerar o codigo. Verifique se a instancia esta conectada e tente novamente.')
+        setErr('Nao foi possivel gerar o codigo de pareamento. Tente novamente ou use o QR Code para conectar.')
       }
     } catch (e) {
       setErr(e.message)
