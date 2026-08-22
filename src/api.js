@@ -63,6 +63,15 @@ export const api = {
     request(`/churches/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   deleteChurch: (id) => request(`/churches/${id}`, { method: "DELETE" }),
 
+  // Usuários de uma igreja (super admin)
+  getChurchUsers: (churchId) => request(`/churches/${churchId}/users`),
+  createChurchUser: (churchId, data) =>
+    request(`/churches/${churchId}/users`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  deleteUser: (id) => request(`/users/${id}`, { method: "DELETE" }),
+
   // Números do WhatsApp (instâncias da Evolution)
   getNumbers: (churchId) => request(`/churches/${churchId}/numbers`),
   createNumber: (churchId, label) =>
