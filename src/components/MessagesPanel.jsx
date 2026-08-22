@@ -59,7 +59,7 @@ function StepsTimeline({ steps }) {
   )
 }
 
-export default function MessagesPanel({ reloadKey }) {
+export default function MessagesPanel({ churchId, reloadKey }) {
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
   const [err, setErr] = useState(null)
@@ -67,7 +67,7 @@ export default function MessagesPanel({ reloadKey }) {
   const load = async () => {
     setLoading(true)
     try {
-      setMessages(await api.getMessages())
+      setMessages(await api.getMessages(100, churchId))
       setErr(null)
     } catch (e) {
       setErr(e.message)
@@ -78,12 +78,12 @@ export default function MessagesPanel({ reloadKey }) {
 
   useEffect(() => {
     load()
-  }, [reloadKey])
+  }, [reloadKey, churchId])
 
   useEffect(() => {
     const id = setInterval(load, 5000)
     return () => clearInterval(id)
-  }, [])
+  }, [churchId])
 
   return (
     <section className="rounded-xl border border-slate-200 bg-white shadow-sm">

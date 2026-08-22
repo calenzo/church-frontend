@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api.js'
-import QrPanel from './QrPanel.jsx'
+import NumbersManager from './NumbersManager.jsx'
 
 function Field({ label, hint, children }) {
   return (
@@ -15,7 +15,7 @@ function Field({ label, hint, children }) {
 const inputCls =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200'
 
-export default function ConfigPanel() {
+export default function ConfigPanel({ churchId }) {
   const [form, setForm] = useState(null)
   const [saving, setSaving] = useState(false)
   const [testing, setTesting] = useState(false)
@@ -23,8 +23,9 @@ export default function ConfigPanel() {
   const [msg, setMsg] = useState(null)
 
   useEffect(() => {
-    api.getConfig().then(setForm).catch(() => setForm(null))
-  }, [])
+    setForm(null)
+    api.getConfig(churchId).then(setForm).catch(() => setForm(null))
+  }, [churchId])
 
   if (!form) return <p className="text-sm text-slate-500">Carregando configuracoes...</p>
 
@@ -34,7 +35,7 @@ export default function ConfigPanel() {
     setSaving(true)
     setMsg(null)
     try {
-      const saved = await api.updateConfig(form)
+      const saved = await api.updateConfig(form, churchId)
       setForm(saved)
       setMsg({ type: 'ok', text: 'Configuracao salva.' })
     } catch (err) {
@@ -48,7 +49,7 @@ export default function ConfigPanel() {
     setTesting(true)
     setTestResult(null)
     try {
-      const res = await api.testLlm()
+      const res = await api.testLlm(churchId)
       setTestResult({
         ok: true,
         data: res,
@@ -64,11 +65,11 @@ export default function ConfigPanel() {
   return (
     <div className="space-y-6">
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-base font-semibold text-slate-900">Contato principal da igreja</h2>
+        <h2 className="mb-1 text-base font-semibold text-slate-900">Contato principal da igreja</h2>
         <p className="mb-4 text-sm text-slate-500">
           Conecte o WhatsApp escaneando o QR code ou usando o codigo de pareamento por telefone.
         </p>
-        <QrPanel />
+        <NumbersManager churchId={churchId} />
       </section>
 
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">

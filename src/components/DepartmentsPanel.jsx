@@ -6,7 +6,7 @@ const inputCls =
 
 const emptyForm = { name: '', description: '', group_name: '', group_jid: '', active: true }
 
-export default function DepartmentsPanel() {
+export default function DepartmentsPanel({ churchId }) {
   const [departments, setDepartments] = useState([])
   const [groups, setGroups] = useState([])
   const [groupsLoading, setGroupsLoading] = useState(true)
@@ -23,7 +23,7 @@ export default function DepartmentsPanel() {
   const load = async () => {
     setLoading(true)
     try {
-      setDepartments(await api.getDepartments())
+      setDepartments(await api.getDepartments(churchId))
       setErr(null)
     } catch (e) {
       setErr(e.message)
@@ -34,14 +34,14 @@ export default function DepartmentsPanel() {
 
   useEffect(() => {
     load()
-  }, [])
+  }, [churchId])
 
   const loadGroups = async (retries = 3, forceRefresh = false) => {
     setGroupsLoading(true)
     setGroupsErr(null)
     for (let i = 0; i < retries; i++) {
       try {
-        setGroups(await api.getGroups(forceRefresh))
+        setGroups(await api.getGroups(forceRefresh, churchId))
         setGroupsErr(null)
         break
       } catch (e) {
@@ -54,7 +54,7 @@ export default function DepartmentsPanel() {
 
   useEffect(() => {
     loadGroups()
-  }, [])
+  }, [churchId])
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -101,8 +101,8 @@ export default function DepartmentsPanel() {
   const submit = async (e) => {
     e.preventDefault()
     try {
-      if (editing === 'new') await api.createDepartment(form)
-      else await api.updateDepartment(editing, form)
+      if (editing === 'new') await api.createDepartment(form, churchId)
+      else await api.updateDepartment(editing, form, churchId)
       cancel()
       await load()
     } catch (e2) {
@@ -113,7 +113,7 @@ export default function DepartmentsPanel() {
   const remove = async (dep) => {
     if (!window.confirm(`Excluir o departamento "${dep.name}"?`)) return
     try {
-      await api.deleteDepartment(dep.id)
+      await api.deleteDepartment(dep.id, churchId)
       await load()
     } catch (e2) {
       setErr(e2.message)
@@ -126,7 +126,7 @@ export default function DepartmentsPanel() {
       await api.testDepartment(dep.id, {
         number: dep.group_jid,
         text: 'Teste de encaminhamento para o grupo do departamento.',
-      })
+      }, churchId)
       setTestMsg((m) => ({ ...m, [dep.id]: { busy: false, text: 'Mensagem de teste enviada.' } }))
     } catch (e2) {
       setTestMsg((m) => ({ ...m, [dep.id]: { busy: false, text: e2.message } }))

@@ -8,7 +8,7 @@ const tabCls = (active) =>
       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
   }`
 
-export default function QrPanel() {
+export default function QrPanel({ number, onStateChange }) {
   const [mode, setMode] = useState('qr')
   const [connected, setConnected] = useState(false)
   const [qr, setQr] = useState(null)
@@ -17,7 +17,7 @@ export default function QrPanel() {
 
   const loadQr = async () => {
     try {
-      const res = await api.getQrCode()
+      const res = await api.getNumberQrCode(number.id)
       if (res.qrcode) {
         setQr(res.qrcode)
         hasQr.current = true
@@ -34,14 +34,20 @@ export default function QrPanel() {
   }
 
   useEffect(() => {
-    if (mode === 'qr') {
-      loadQr()
-      const id = setInterval(() => {
-        if (!hasQr.current) loadQr()
-      }, 5000)
-      return () => clearInterval(id)
-    }
-  }, [mode])
+    loadQr()
+    const id = setInterval(() => {
+      if (!hasQr.current) loadQr()
+    }, 5000)
+    return () => clearInterval(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [number.id])
+
+  const handleDisconnected = () => {
+    setConnected(false)
+    setQr(null)
+    loadQr()
+    onStateChange?.()
+  }
 
   if (connected) {
     return (
@@ -50,15 +56,9 @@ export default function QrPanel() {
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <p className="flex items-center gap-2 text-sm text-emerald-600">
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            WhatsApp conectado.
+            WhatsApp conectado{number.label ? ` (${number.label})` : ''}.
           </p>
-          <DisconnectButton
-            onDisconnected={() => {
-              setConnected(false)
-              setQr(null)
-              loadQr()
-            }}
-          />
+          <DisconnectButton numberId={number.id} onDisconnected={handleDisconnected} />
         </div>
       </div>
     )
@@ -75,7 +75,7 @@ export default function QrPanel() {
         {qr && (
           <>
             <p className="mt-4 mb-3 text-sm text-slate-500">
-              Escaneie o QR code abaixo com o WhatsApp (Ajustes &gt; Aparelhos conectados &gt; Conectar aparelho) para parear o numero da igreja.
+              Escaneie o QR code abaixo com o WhatsApp (Ajustes &gt; Aparelhos conectados &gt; Conectar aparelho).
             </p>
             <img src={qr} alt="QR code para conectar o WhatsApp" className="h-56 w-56 rounded-lg border border-slate-200" />
             <p className="mt-3 text-xs text-slate-400">Atualiza automaticamente a cada 5 segundos.</p>
@@ -88,12 +88,25 @@ export default function QrPanel() {
   return (
     <div>
       <ModeTabs mode={mode} setMode={setMode} />
-      <PairingForm onQrFallback={(qr) => { setQr(qr); setMode('qr') }} />
+      <PairingForm numberId={number.id} onQrFallback={(qr) => { setQr(qr); setMode('qr') }} />
     </div>
   )
 }
 
-function DisconnectButton({ onDisconnected }) {
+function ModeTabs({ mode, setMode }) {
+  return (
+    <div className="flex gap-2">
+      <button className={tabCls(mode === 'qr')} onClick={() => setMode('qr')}>
+        QR Code
+      </button>
+      <button className={tabCls(mode === 'code')} onClick={() => setMode('code')}>
+        Codigo por telefone
+      </button>
+    </div>
+  )
+}
+
+function DisconnectButton({ numberId, onDisconnected }) {
   const [confirming, setConfirming] = useState(false)
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState(null)
@@ -102,7 +115,7 @@ function DisconnectButton({ onDisconnected }) {
     setLoading(true)
     setErr(null)
     try {
-      await api.disconnectWhatsApp()
+      await api.disconnectNumber(numberId)
       setConfirming(false)
       onDisconnected()
     } catch (e) {
@@ -116,7 +129,7 @@ function DisconnectButton({ onDisconnected }) {
     <div className="flex flex-wrap items-center gap-2">
       {confirming ? (
         <>
-          <span className="text-sm text-slate-500">Desconectar o WhatsApp da plataforma?</span>
+          <span className="text-sm text-slate-500">Desconectar este WhatsApp?</span>
           <button
             onClick={disconnect}
             disabled={loading}
@@ -145,20 +158,7 @@ function DisconnectButton({ onDisconnected }) {
   )
 }
 
-function ModeTabs({ mode, setMode }) {
-  return (
-    <div className="flex gap-2">
-      <button className={tabCls(mode === 'qr')} onClick={() => setMode('qr')}>
-        QR Code
-      </button>
-      <button className={tabCls(mode === 'code')} onClick={() => setMode('code')}>
-        Codigo por telefone
-      </button>
-    </div>
-  )
-}
-
-function PairingForm({ onQrFallback }) {
+function PairingForm({ numberId, onQrFallback }) {
   const [phone, setPhone] = useState('')
   const [code, setCode] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -174,7 +174,7 @@ function PairingForm({ onQrFallback }) {
     setErr(null)
     setCode(null)
     try {
-      const res = await api.getPairingCode(digits)
+      const res = await api.getNumberPairingCode(numberId, digits)
       if (res.pairingCode) {
         setCode(res.pairingCode)
       } else if (res.qrcode && onQrFallback) {
