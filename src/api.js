@@ -53,6 +53,7 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ number }),
     }),
+  disconnectWhatsApp: () => request("/evolution/disconnect", { method: "POST" }),
   getGroups: (refresh = false) =>
     request(`/evolution/groups${refresh ? "?refresh=true" : ""}`),
   getEvolutionDebug: () => request("/evolution/debug"),

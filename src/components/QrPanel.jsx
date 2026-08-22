@@ -47,10 +47,19 @@ export default function QrPanel() {
     return (
       <div>
         <ModeTabs mode={mode} setMode={setMode} />
-        <p className="mt-4 flex items-center gap-2 text-sm text-emerald-600">
-          <span className="h-2 w-2 rounded-full bg-emerald-500" />
-          WhatsApp conectado.
-        </p>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <p className="flex items-center gap-2 text-sm text-emerald-600">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            WhatsApp conectado.
+          </p>
+          <DisconnectButton
+            onDisconnected={() => {
+              setConnected(false)
+              setQr(null)
+              loadQr()
+            }}
+          />
+        </div>
       </div>
     )
   }
@@ -80,6 +89,58 @@ export default function QrPanel() {
     <div>
       <ModeTabs mode={mode} setMode={setMode} />
       <PairingForm onQrFallback={(qr) => { setQr(qr); setMode('qr') }} />
+    </div>
+  )
+}
+
+function DisconnectButton({ onDisconnected }) {
+  const [confirming, setConfirming] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [err, setErr] = useState(null)
+
+  const disconnect = async () => {
+    setLoading(true)
+    setErr(null)
+    try {
+      await api.disconnectWhatsApp()
+      setConfirming(false)
+      onDisconnected()
+    } catch (e) {
+      setErr(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      {confirming ? (
+        <>
+          <span className="text-sm text-slate-500">Desconectar o WhatsApp da plataforma?</span>
+          <button
+            onClick={disconnect}
+            disabled={loading}
+            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+          >
+            {loading ? 'Desconectando...' : 'Confirmar'}
+          </button>
+          <button
+            onClick={() => setConfirming(false)}
+            disabled={loading}
+            className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 disabled:opacity-50"
+          >
+            Cancelar
+          </button>
+        </>
+      ) : (
+        <button
+          onClick={() => setConfirming(true)}
+          className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+        >
+          Desconectar
+        </button>
+      )}
+      {err && <p className="w-full text-sm text-red-700">{err}</p>}
     </div>
   )
 }
