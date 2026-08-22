@@ -22,14 +22,22 @@ export default function QrPanel({ number, onStateChange }) {
         setQr(res.qrcode)
         hasQr.current = true
         setConnected(false)
-      } else {
-        setQr(null)
-        hasQr.current = false
-        setConnected(true)
+        setErr(null)
+        return
       }
+      // Sem QR na resposta: so considerar conectado se o estado real for "open".
+      try {
+        const st = await api.getNumberState(number.id)
+        setConnected(st.state === 'open')
+      } catch {
+        setConnected(false)
+      }
+      setQr(null)
       setErr(null)
     } catch (e) {
+      // QR ainda nao disponivel ou falha temporaria: segue tentando.
       setErr(e.message)
+      setConnected(false)
     }
   }
 

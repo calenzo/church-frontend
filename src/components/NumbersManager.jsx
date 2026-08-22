@@ -91,7 +91,11 @@ export default function NumbersManager({ churchId, canManage = false, onChanged 
       {loading ? (
         <p className="text-sm text-slate-500">Carregando numeros...</p>
       ) : numbers.length === 0 ? (
-        <p className="text-sm text-slate-500">Nenhum numero cadastrado para esta igreja.</p>
+        <p className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-slate-600">
+          {canManage
+            ? 'Nenhum numero cadastrado ainda. Adicione um numero abaixo para gerar o QR code ou o codigo de pareamento do WhatsApp.'
+            : 'Nenhum numero cadastrado para esta igreja.'}
+        </p>
       ) : (
         <div className="space-y-3">
           {numbers.map((n) => (
