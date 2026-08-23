@@ -1,4 +1,8 @@
-const API = "https://church-backend-vzzp.onrender.com/api";
+// Dev usa o proxy do Vite (/api -> localhost:8000). Em producao,
+// defina VITE_API_URL na hora do build para apontar ao backend.
+const API =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? "/api" : "https://church-backend-vzzp.onrender.com/api");
 
 const TOKEN_KEY = "church_auth_token";
 
