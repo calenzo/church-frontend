@@ -4,6 +4,7 @@ import { api, getToken, setToken } from './api.js'
 import ChurchesPanel from './components/ChurchesPanel.jsx'
 import ConfigPanel from './components/ConfigPanel.jsx'
 import DepartmentsPanel from './components/DepartmentsPanel.jsx'
+import ContactsPanel from './components/ContactsPanel.jsx'
 import LandingPage from './components/LandingPage.jsx'
 import LoginPage from './components/LoginPage.jsx'
 import MessagesPanel from './components/MessagesPanel.jsx'
@@ -28,6 +29,7 @@ const CHURCH_TABS = [
   { id: 'numbers', label: 'Números' },
   { id: 'config', label: 'Configuração' },
   { id: 'departments', label: 'Departamentos' },
+  { id: 'contacts', label: 'Contatos' },
   { id: 'messages', label: 'Mensagens' },
 ]
 
@@ -264,6 +266,7 @@ function ChurchArea({ user = null, churchId = null, churchName = '', onBack = nu
             )}
             {tab === 'config' && <ConfigPanel churchId={activeChurchId} />}
             {tab === 'departments' && <DepartmentsPanel churchId={activeChurchId} />}
+            {tab === 'contacts' && <ContactsPanel churchId={activeChurchId} />}
             {tab === 'messages' && (
               <MessagesPanel churchId={activeChurchId} reloadKey={status?.updated_at} />
             )}

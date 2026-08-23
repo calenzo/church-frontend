@@ -76,6 +76,18 @@ export const api = {
     }),
   deleteUser: (id) => request(`/users/${id}`, { method: "DELETE" }),
 
+  // Contatos da igreja (número -> nome/cargo, usado pela IA)
+  getContacts: (churchId, search) =>
+    request(`/churches/${churchId}/contacts${qs({ search })}`),
+  createContact: (churchId, data) =>
+    request(`/churches/${churchId}/contacts`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateContact: (id, data) =>
+    request(`/contacts/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  deleteContact: (id) => request(`/contacts/${id}`, { method: "DELETE" }),
+
   // Números do WhatsApp (instâncias da Evolution)
   getNumbers: (churchId) => request(`/churches/${churchId}/numbers`),
   createNumber: (churchId, label) =>
