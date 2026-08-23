@@ -11,6 +11,7 @@ export default function DepartmentsPanel({ churchId }) {
   const [groups, setGroups] = useState([])
   const [groupsLoading, setGroupsLoading] = useState(true)
   const [groupsErr, setGroupsErr] = useState(null)
+  const [groupsLoadedAt, setGroupsLoadedAt] = useState(0)
   const [groupSearch, setGroupSearch] = useState('')
   const [groupOpen, setGroupOpen] = useState(false)
   const groupRef = useRef(null)
@@ -42,6 +43,7 @@ export default function DepartmentsPanel({ churchId }) {
     for (let i = 0; i < retries; i++) {
       try {
         setGroups(await api.getGroups(forceRefresh, churchId))
+        setGroupsLoadedAt(Date.now())
         setGroupsErr(null)
         break
       } catch (e) {
@@ -50,6 +52,14 @@ export default function DepartmentsPanel({ churchId }) {
       }
     }
     setGroupsLoading(false)
+  }
+
+  // Recarrega a lista em segundo plano quando estiver velha (>60s) ou vazia.
+  const refreshGroupsIfStale = () => {
+    if (groupsLoading) return
+    if (!groupsLoadedAt || Date.now() - groupsLoadedAt > 60000 || groups.length === 0) {
+      loadGroups()
+    }
   }
 
   useEffect(() => {
@@ -86,11 +96,13 @@ export default function DepartmentsPanel({ churchId }) {
   const startEdit = (dep) => {
     setEditing(dep.id)
     setForm({ ...dep })
+    refreshGroupsIfStale()
   }
 
   const startNew = () => {
     setEditing('new')
     setForm(emptyForm)
+    refreshGroupsIfStale()
   }
 
   const cancel = () => {
@@ -176,7 +188,7 @@ export default function DepartmentsPanel({ churchId }) {
                   <label className="text-sm font-medium text-slate-700">Grupo do WhatsApp</label>
                   <button
                     type="button"
-                    onClick={() => loadGroups(1, true)}
+                    onClick={() => loadGroups(2, true)}
                     disabled={groupsLoading}
                     className="text-xs text-blue-500 hover:underline disabled:opacity-40"
                   >
@@ -245,7 +257,16 @@ export default function DepartmentsPanel({ churchId }) {
                   </div>
                 )}
                 {!groupsErr && !groupsLoading && groups.length === 0 && (
-                  <p className="mt-1 text-xs text-slate-400">Nenhum grupo encontrado. Verifique se a instancia esta conectada.</p>
+                  <p className="mt-1 text-xs text-slate-400">
+                    Nenhum grupo encontrado. Confira se o numero esta conectado (aba Numeros) e,
+                    se o grupo foi criado agora, aguarde alguns segundos e clique em "Atualizar lista".
+                  </p>
+                )}
+                {!groupsErr && !groupsLoading && groups.length > 0 && groupsLoadedAt > 0 && (
+                  <p className="mt-1 text-xs text-slate-400">
+                    Lista carregada as {new Date(groupsLoadedAt).toLocaleTimeString()} com os grupos
+                    da conexao ativa.
+                  </p>
                 )}
                 {form.group_name && selectedGroup && (
                   <span className="mt-1 block text-xs text-slate-400">
