@@ -15,6 +15,47 @@ const emptyForm = {
 
 const TIPOS = ['Membro', 'Visitante', 'Novo convertido', 'Liderança', 'Prestador de serviço', 'Contato externo']
 
+const fmtDate = (iso) => {
+  if (!iso) return ''
+  const d = new Date(iso)
+  return isNaN(d.getTime())
+    ? ''
+    : d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
+
+const isExpired = (m) =>
+  m.memory_type === 'temporaria' && m.expires_at && new Date(m.expires_at) < new Date()
+
+function ContactSheet({ contact }) {
+  const rows = [
+    ['Nome', contact.name],
+    ['Telefone', contact.phone],
+    ['Função', contact.role],
+    ['Departamento', contact.department_name],
+    ['Tipo', contact.contact_type],
+    ['Última conversa', fmtDate(contact.last_talk_at)],
+    ['Última intenção', contact.last_intent],
+  ].filter(([, v]) => v && String(v).trim())
+  return (
+    <div className="rounded-md border border-slate-200 bg-white p-2.5 text-[11px] text-slate-600">
+      <div className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-3">
+        {rows.map(([k, v]) => (
+          <p key={k} className="truncate" title={String(v)}>
+            <span className="font-semibold uppercase tracking-wide text-slate-400">{k}: </span>
+            {v}
+          </p>
+        ))}
+      </div>
+      {contact.resumo_contexto && (
+        <p className="mt-1.5 border-t border-slate-100 pt-1.5">
+          <span className="font-semibold uppercase tracking-wide text-slate-400">Resumo do contexto: </span>
+          {contact.resumo_contexto}
+        </p>
+      )}
+    </div>
+  )
+}
+
 function MemorySection({ contact, onErr }) {
   const [memories, setMemories] = useState([])
   const [loading, setLoading] = useState(true)
@@ -39,6 +80,8 @@ function MemorySection({ contact, onErr }) {
   const pendentes = memories.filter((m) => m.kind === 'pendencia' && m.status !== 'resolvida')
   const resolvidas = memories.filter((m) => m.kind === 'pendencia' && m.status === 'resolvida')
   const outros = memories.filter((m) => m.kind !== 'pendencia')
+  const ativos = outros.filter((m) => !isExpired(m))
+  const expiradas = outros.filter((m) => isExpired(m))
 
   const badge = (m) =>
     m.kind === 'pendencia'
@@ -108,7 +151,18 @@ function MemorySection({ contact, onErr }) {
           {m.kind === 'pendencia' ? (m.status === 'resolvida' ? 'resolvida' : 'pendente') : m.kind}
           {m.source === 'automatica' ? ' · auto' : ''}
         </span>
-        <span className="text-xs text-slate-700">{m.content}</span>
+        {m.memory_type === 'temporaria' && (
+          <span
+            className={`mr-2 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+              isExpired(m) ? 'bg-red-100 text-red-600' : 'bg-purple-100 text-purple-700'
+            }`}
+            title={m.expires_at ? `Válida até ${fmtDate(m.expires_at)}` : 'Memória temporária'}
+          >
+            {isExpired(m) ? 'expirada' : 'temporária'}
+            {m.expires_at && !isExpired(m) ? ` · até ${fmtDate(m.expires_at)}` : ''}
+          </span>
+        )}
+        <span className={`text-xs ${isExpired(m) ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{m.content}</span>
         {m.responsible && <span className="ml-1 text-[10px] text-slate-400">({m.responsible})</span>}
       </div>
       <div className="flex shrink-0 gap-2">
@@ -126,6 +180,8 @@ function MemorySection({ contact, onErr }) {
 
   return (
     <div className="mt-3 space-y-3 rounded-lg border border-slate-200 bg-slate-50/60 p-3">
+      <ContactSheet contact={contact} />
+
       {contact.memory_locked && (
         <p className="text-[11px] font-medium text-orange-600">
           Memória automática bloqueada — a IA não grava novos fatos deste contato.
@@ -186,16 +242,24 @@ function MemorySection({ contact, onErr }) {
               {pendentes.map(item)}
             </div>
           )}
-          {outros.length > 0 && (
+          {ativos.length > 0 && (
             <div>
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Fatos & observações</p>
-              {outros.map(item)}
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Fatos &amp; observações</p>
+              {ativos.map(item)}
             </div>
           )}
           {resolvidas.length > 0 && (
             <div>
               <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Resolvidas</p>
               {resolvidas.map(item)}
+            </div>
+          )}
+          {expiradas.length > 0 && (
+            <div>
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                Expiradas (a IA não usa mais como informação atual)
+              </p>
+              {expiradas.map(item)}
             </div>
           )}
         </div>
