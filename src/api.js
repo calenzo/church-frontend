@@ -88,6 +88,19 @@ export const api = {
     request(`/contacts/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   deleteContact: (id) => request(`/contacts/${id}`, { method: "DELETE" }),
 
+  // Memória dos contatos (fatos, observações e pendências usadas pela IA)
+  getContactMemory: (contactId) => request(`/contacts/${contactId}/memory`),
+  createContactMemory: (contactId, data) =>
+    request(`/contacts/${contactId}/memory`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateMemory: (id, data) =>
+    request(`/memories/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  deleteMemory: (id) => request(`/memories/${id}`, { method: "DELETE" }),
+  clearContactMemory: (contactId, scope = "automatica") =>
+    request(`/contacts/${contactId}/memory${qs({ scope })}`, { method: "DELETE" }),
+
   // Regras de encaminhamento automático (assunto -> responsável -> telefone)
   getRoutingRules: (churchId) => request(`/churches/${churchId}/routing-rules`),
   createRoutingRule: (churchId, data) =>
