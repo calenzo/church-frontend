@@ -308,7 +308,14 @@ export default function DepartmentsPanel({ churchId }) {
                   <tr key={dep.id} className="border-b border-slate-100 align-top">
                     <td className="py-3 pr-4">
                       <div className="font-medium text-slate-900">{dep.name}</div>
-                      {dep.description && <div className="text-xs text-slate-500">{dep.description}</div>}
+                      {dep.description && (
+                        <div
+                          className="line-clamp-2 max-w-sm break-words text-xs text-slate-500"
+                          title={dep.description}
+                        >
+                          {dep.description}
+                        </div>
+                      )}
                     </td>
                     <td className="py-3 pr-4">
                       {dep.group_name && <div className="text-slate-700">{dep.group_name}</div>}
