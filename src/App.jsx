@@ -5,6 +5,7 @@ import ChurchesPanel from './components/ChurchesPanel.jsx'
 import ConfigPanel from './components/ConfigPanel.jsx'
 import DepartmentsPanel from './components/DepartmentsPanel.jsx'
 import ContactsPanel from './components/ContactsPanel.jsx'
+import RoutingRulesPanel from './components/RoutingRulesPanel.jsx'
 import LandingPage from './components/LandingPage.jsx'
 import LoginPage from './components/LoginPage.jsx'
 import MessagesPanel from './components/MessagesPanel.jsx'
@@ -30,6 +31,7 @@ const CHURCH_TABS = [
   { id: 'config', label: 'Configuração' },
   { id: 'departments', label: 'Departamentos' },
   { id: 'contacts', label: 'Contatos' },
+  { id: 'routing', label: 'Encaminhamentos' },
   { id: 'messages', label: 'Mensagens' },
 ]
 
@@ -267,6 +269,7 @@ function ChurchArea({ user = null, churchId = null, churchName = '', onBack = nu
             {tab === 'config' && <ConfigPanel churchId={activeChurchId} />}
             {tab === 'departments' && <DepartmentsPanel churchId={activeChurchId} />}
             {tab === 'contacts' && <ContactsPanel churchId={activeChurchId} />}
+            {tab === 'routing' && <RoutingRulesPanel churchId={activeChurchId} />}
             {tab === 'messages' && (
               <MessagesPanel churchId={activeChurchId} reloadKey={status?.updated_at} />
             )}

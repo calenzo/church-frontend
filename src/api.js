@@ -88,6 +88,17 @@ export const api = {
     request(`/contacts/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   deleteContact: (id) => request(`/contacts/${id}`, { method: "DELETE" }),
 
+  // Regras de encaminhamento automático (assunto -> responsável -> telefone)
+  getRoutingRules: (churchId) => request(`/churches/${churchId}/routing-rules`),
+  createRoutingRule: (churchId, data) =>
+    request(`/churches/${churchId}/routing-rules`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateRoutingRule: (id, data) =>
+    request(`/routing-rules/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  deleteRoutingRule: (id) => request(`/routing-rules/${id}`, { method: "DELETE" }),
+
   // Números do WhatsApp (instâncias da Evolution)
   getNumbers: (churchId) => request(`/churches/${churchId}/numbers`),
   createNumber: (churchId, label) =>
