@@ -46,6 +46,19 @@ export default function ConfigPanel({ churchId }) {
     api.getConfig(churchId).then(setForm).catch(() => setForm(null))
   }, [churchId])
 
+  const togglePermission = useCallback(async (field) => {
+    setForm((prev) => {
+      if (!prev) return prev
+      const newVal = !prev[field]
+      const updated = { ...prev, [field]: newVal }
+      api.updateConfig(updated, churchId).then((saved) => setForm(saved)).catch((err) => {
+        setForm((p) => ({ ...p, [field]: !newVal }))
+        setMsg({ type: 'err', text: err.message })
+      })
+      return updated
+    })
+  }, [churchId])
+
   if (!form)
     return <p className="text-sm text-slate-500 dark:text-slate-400">Carregando configuracoes...</p>
 
@@ -64,19 +77,6 @@ export default function ConfigPanel({ churchId }) {
       setSaving(false)
     }
   }
-
-  const togglePermission = useCallback(async (field) => {
-    const newVal = !form[field]
-    const updated = { ...form, [field]: newVal }
-    setForm(updated)
-    try {
-      const saved = await api.updateConfig(updated, churchId)
-      setForm(saved)
-    } catch (err) {
-      setForm((prev) => ({ ...prev, [field]: !newVal }))
-      setMsg({ type: 'err', text: err.message })
-    }
-  }, [form, churchId])
 
   const test = async () => {
     setTesting(true)
