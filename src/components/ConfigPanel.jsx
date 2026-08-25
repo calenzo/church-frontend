@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { api } from '../api.js'
 import NumbersManager from './NumbersManager.jsx'
 import { btnPrimary, btnSecondary, inputCls } from '../ui.js'
@@ -9,6 +9,27 @@ function Field({ label, hint, children }) {
       <span className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">{label}</span>
       {children}
       {hint && <span className="mt-1 block text-xs text-slate-400 dark:text-slate-500">{hint}</span>}
+    </label>
+  )
+}
+
+function Toggle({ checked, onChange, label, hint }) {
+  return (
+    <label className="flex items-start gap-3 cursor-pointer">
+      <div className="relative mt-0.5">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={onChange}
+          className="peer sr-only"
+        />
+        <div className="h-5 w-9 rounded-full bg-slate-300 peer-checked:bg-emerald-500 transition-colors dark:bg-slate-600 dark:peer-checked:bg-emerald-600" />
+        <div className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-4 dark:bg-slate-200" />
+      </div>
+      <div>
+        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{label}</span>
+        {hint && <span className="mt-0.5 block text-xs text-slate-400 dark:text-slate-500">{hint}</span>}
+      </div>
     </label>
   )
 }
@@ -43,6 +64,19 @@ export default function ConfigPanel({ churchId }) {
       setSaving(false)
     }
   }
+
+  const togglePermission = useCallback(async (field) => {
+    const newVal = !form[field]
+    const updated = { ...form, [field]: newVal }
+    setForm(updated)
+    try {
+      const saved = await api.updateConfig(updated, churchId)
+      setForm(saved)
+    } catch (err) {
+      setForm((prev) => ({ ...prev, [field]: !newVal }))
+      setMsg({ type: 'err', text: err.message })
+    }
+  }, [form, churchId])
 
   const test = async () => {
     setTesting(true)
@@ -129,6 +163,39 @@ export default function ConfigPanel({ churchId }) {
             )}
           </div>
         )}
+      </section>
+
+      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h2 className="mb-1 text-base font-semibold text-slate-900 dark:text-slate-100">Permissoes do Webhook</h2>
+        <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
+          Controle quais funcionalidades estao ativas. Desligue algo que nao usa para reduzir custo de LLM e evitar respostas indesejadas.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <h4 className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-3">Tipos de mensagem</h4>
+            <div className="space-y-3">
+              <Toggle checked={form.process_text} onChange={() => togglePermission('process_text')} label="Texto" hint="Mensagens de texto" />
+              <Toggle checked={form.process_audio} onChange={() => togglePermission('process_audio')} label="Audio" hint="Transcreve e responde audios" />
+            </div>
+          </div>
+          <div>
+            <h4 className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-3">Canais</h4>
+            <div className="space-y-3">
+              <Toggle checked={form.process_groups} onChange={() => togglePermission('process_groups')} label="Grupos" hint="Responde em grupos vinculados" />
+              <Toggle checked={form.process_private} onChange={() => togglePermission('process_private')} label="Privado" hint="Responde no chat privado" />
+            </div>
+          </div>
+          <div>
+            <h4 className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-3">Funcionalidades da IA</h4>
+            <div className="space-y-3">
+              <Toggle checked={form.auto_reply} onChange={() => togglePermission('auto_reply')} label="Resposta automatica" hint="Envia resposta da LLM" />
+              <Toggle checked={form.forward_to_groups} onChange={() => togglePermission('forward_to_groups')} label="Encaminhar para grupos" hint="Encaminha msg para grupo do depto" />
+              <Toggle checked={form.apply_routing_rules} onChange={() => togglePermission('apply_routing_rules')} label="Regras de roteamento" hint="Encaminha para responsaveis" />
+              <Toggle checked={form.auto_register_contacts} onChange={() => togglePermission('auto_register_contacts')} label="Cadastro automatico" hint="Salva contatos que se identificam" />
+              <Toggle checked={form.auto_memory} onChange={() => togglePermission('auto_memory')} label="Memoria" hint="Salva fatos e pendencias" />
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   )
