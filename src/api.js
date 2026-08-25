@@ -162,4 +162,44 @@ export const api = {
   getStatus: (churchId) => request(`/status${qs({ church_id: churchId })}`),
   getGroups: (refresh = false, churchId) =>
     request(`/evolution/groups${qs({ refresh: refresh || undefined, church_id: churchId })}`),
+
+  // Membros e lembretes de aniversário
+  getMembers: (churchId, search) => request(`/membros${qs({ church_id: churchId, search })}`),
+  createMember: (data, churchId) =>
+    request(`/membros${qs({ church_id: churchId })}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateMember: (id, data, churchId) =>
+    request(`/membros/${id}${qs({ church_id: churchId })}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  deleteMember: (id, churchId) =>
+    request(`/membros/${id}${qs({ church_id: churchId })}`, { method: "DELETE" }),
+  getTodayBirthdays: (churchId) => request(`/membros/hoje${qs({ church_id: churchId })}`),
+  getUpcomingBirthdays: (churchId) => request(`/membros/proximos${qs({ church_id: churchId })}`),
+  getBirthdayRecipients: (churchId) => request(`/membros/destinatarios${qs({ church_id: churchId })}`),
+  createBirthdayRecipient: (data, churchId) =>
+    request(`/membros/destinatarios${qs({ church_id: churchId })}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateBirthdayRecipient: (id, data, churchId) =>
+    request(`/membros/destinatarios/${id}${qs({ church_id: churchId })}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  deleteBirthdayRecipient: (id, churchId) =>
+    request(`/membros/destinatarios/${id}${qs({ church_id: churchId })}`, { method: "DELETE" }),
+  getBirthdayConfig: (churchId) => request(`/membros/config${qs({ church_id: churchId })}`),
+  updateBirthdayConfig: (data, churchId) =>
+    request(`/membros/config${qs({ church_id: churchId })}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  getBirthdayLogs: (churchId, limit = 50) =>
+    request(`/membros/lembretes${qs({ church_id: churchId, limit })}`),
+  testBirthdayReminder: (churchId) =>
+    request(`/membros/lembretes/teste${qs({ church_id: churchId })}`, { method: "POST" }),
 };
