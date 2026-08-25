@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react'
 import { api } from '../api.js'
 
 const inputCls =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200'
+  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-800'
 
 const STATUS_BADGE = {
-  enviado: 'bg-emerald-100 text-emerald-700',
-  pendente: 'bg-amber-100 text-amber-700',
-  falhou: 'bg-red-100 text-red-700',
+  enviado: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+  pendente: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+  falhou: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
 }
 
 const fmtDateTime = (iso) => {
@@ -22,11 +22,11 @@ const emptyMember = { name: '', birth_day: '', birth_month: '' }
 
 function SectionCard({ title, subtitle, children, right }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
-          {subtitle && <p className="mt-1 text-xs text-slate-500">{subtitle}</p>}
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
+          {subtitle && <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>}
         </div>
         {right}
       </div>
@@ -192,19 +192,19 @@ export default function MembersPanel({ churchId }) {
   }
 
   const memberItem = (m) => (
-    <tr key={m.id} className={m.is_today ? 'bg-pink-50' : ''}>
-      <td className="px-3 py-2 text-sm font-medium text-slate-800">
+    <tr key={m.id} className={m.is_today ? 'bg-pink-50 dark:bg-pink-950/30' : ''}>
+      <td className="px-3 py-2 text-sm font-medium text-slate-800 dark:text-slate-200">
         {m.name}
         {m.is_today && (
-          <span className="ml-2 whitespace-nowrap rounded-full bg-pink-100 px-2 py-0.5 text-[10px] font-semibold text-pink-700">
+          <span className="ml-2 whitespace-nowrap rounded-full bg-pink-100 px-2 py-0.5 text-[10px] font-semibold text-pink-700 dark:bg-pink-900/50 dark:text-pink-300">
             🎂 HOJE
           </span>
         )}
       </td>
-      <td className="whitespace-nowrap px-3 py-2 text-sm text-slate-600">{m.birthday}</td>
+      <td className="whitespace-nowrap px-3 py-2 text-sm text-slate-600 dark:text-slate-400">{m.birthday}</td>
       <td className="whitespace-nowrap px-3 py-2 text-right">
-        <button onClick={() => startEditMember(m)} className="mr-3 text-xs text-blue-500 hover:underline">Editar</button>
-        <button onClick={() => removeMember(m)} className="text-xs text-red-500 hover:underline">Excluir</button>
+        <button onClick={() => startEditMember(m)} className="mr-3 text-xs text-blue-500 hover:underline dark:text-blue-400">Editar</button>
+        <button onClick={() => removeMember(m)} className="text-xs text-red-500 hover:underline dark:text-red-400">Excluir</button>
       </td>
     </tr>
   )
@@ -217,16 +217,16 @@ export default function MembersPanel({ churchId }) {
         subtitle="Lista visual — a partir de hoje."
       >
         {upcoming.length === 0 ? (
-          <p className="text-xs text-slate-400">Nenhum membro cadastrado ainda.</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">Nenhum membro cadastrado ainda.</p>
         ) : (
           <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2">
             {upcoming.map((u, i) => (
-              <li key={i} className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-sm">
-                <span className={u.is_today ? 'font-semibold text-pink-700' : 'text-slate-700'}>
+              <li key={i} className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-sm dark:bg-slate-800">
+                <span className={u.is_today ? 'font-semibold text-pink-700 dark:text-pink-300' : 'text-slate-700 dark:text-slate-300'}>
                   {u.is_today && '🎂 '}
                   {u.name}
                 </span>
-                <span className={`shrink-0 text-xs ${u.is_today ? 'font-bold text-pink-700' : 'text-slate-500'}`}>
+                <span className={`shrink-0 text-xs ${u.is_today ? 'font-bold text-pink-700 dark:text-pink-300' : 'text-slate-500 dark:text-slate-400'}`}>
                   {u.birthday}{!u.is_today && u.days_until > 0 ? ` · em ${u.days_until} dia${u.days_until > 1 ? 's' : ''}` : ''}
                   {u.is_today ? ' · HOJE' : ''}
                 </span>
@@ -242,7 +242,7 @@ export default function MembersPanel({ churchId }) {
         subtitle="Somente dia e mês do aniversário — o sistema cuida do resto todos os anos."
       >
         <form onSubmit={submitMember} className="space-y-3">
-          <label className="block text-xs font-medium text-slate-600">
+          <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">
             Nome completo
             <input
               value={memberForm.name}
@@ -252,7 +252,7 @@ export default function MembersPanel({ churchId }) {
             />
           </label>
           <div className="flex flex-wrap gap-3">
-            <label className="text-xs font-medium text-slate-600">
+            <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
               Dia do aniversário
               <input
                 type="number"
@@ -264,7 +264,7 @@ export default function MembersPanel({ churchId }) {
                 className={`mt-1 w-32 ${inputCls}`}
               />
             </label>
-            <label className="text-xs font-medium text-slate-600">
+            <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
               Mês do aniversário
               <input
                 type="number"
@@ -288,7 +288,7 @@ export default function MembersPanel({ churchId }) {
                   setEditingMember(null)
                   setMemberForm(emptyMember)
                 }}
-                className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-100"
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700"
               >
                 Cancelar
               </button>
@@ -310,29 +310,29 @@ export default function MembersPanel({ churchId }) {
               placeholder="Buscar membro..."
               className={`${inputCls} w-52`}
             />
-            <button onClick={searchMembers} className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">
+            <button onClick={searchMembers} className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700">
               Buscar
             </button>
           </div>
         }
       >
         {loadingMembers ? (
-          <p className="py-6 text-center text-sm text-slate-400">Carregando...</p>
+          <p className="py-6 text-center text-sm text-slate-400 dark:text-slate-500">Carregando...</p>
         ) : members.length === 0 ? (
-          <p className="py-6 text-center text-sm text-slate-400">
+          <p className="py-6 text-center text-sm text-slate-400 dark:text-slate-500">
             Nenhum membro encontrado{search ? ' para esta busca' : ' ainda'}.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-slate-100">
-            <table className="min-w-full divide-y divide-slate-100">
-              <thead className="bg-slate-50">
+          <div className="overflow-x-auto rounded-lg border border-slate-100 dark:border-slate-700">
+            <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
+              <thead className="bg-slate-50 dark:bg-slate-800">
                 <tr>
-                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">Nome</th>
-                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">Aniversário</th>
-                  <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-slate-400">Ações</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Nome</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Aniversário</th>
+                  <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Ações</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50 bg-white">{members.map(memberItem)}</tbody>
+              <tbody className="divide-y divide-slate-50 bg-white dark:divide-slate-700 dark:bg-slate-900">{members.map(memberItem)}</tbody>
             </table>
           </div>
         )}
@@ -345,7 +345,7 @@ export default function MembersPanel({ churchId }) {
       >
         <form onSubmit={submitRecipient} className="space-y-3">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <label className="text-xs font-medium text-slate-600">
+            <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
               Nome
               <input
                 value={recipientForm.name}
@@ -354,7 +354,7 @@ export default function MembersPanel({ churchId }) {
                 className={`mt-1 ${inputCls}`}
               />
             </label>
-            <label className="text-xs font-medium text-slate-600">
+            <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
               Telefone WhatsApp
               <input
                 value={recipientForm.phone}
@@ -375,7 +375,7 @@ export default function MembersPanel({ churchId }) {
                   setEditingRecipient(null)
                   setRecipientForm({ name: '', phone: '' })
                 }}
-                className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-100"
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700"
               >
                 Cancelar
               </button>
@@ -383,20 +383,20 @@ export default function MembersPanel({ churchId }) {
           </div>
         </form>
 
-        <div className="mt-3 divide-y divide-slate-100">
+        <div className="mt-3 divide-y divide-slate-100 dark:divide-slate-700">
           {recipients.length === 0 ? (
-            <p className="py-4 text-center text-xs text-slate-400">Nenhum destinatário cadastrado.</p>
+            <p className="py-4 text-center text-xs text-slate-400 dark:text-slate-500">Nenhum destinatário cadastrado.</p>
           ) : (
             recipients.map((r) => (
               <div key={r.id} className="flex items-center justify-between gap-3 py-2">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-slate-900">
+                  <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
                     {r.name || '(sem nome)'}
                     {!r.active && (
-                      <span className="ml-2 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] text-slate-500">inativo</span>
+                      <span className="ml-2 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] text-slate-500 dark:bg-slate-700 dark:text-slate-400">inativo</span>
                     )}
                   </p>
-                  <p className="text-xs text-slate-500">{r.phone}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{r.phone}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   <button
@@ -408,7 +408,7 @@ export default function MembersPanel({ churchId }) {
                         setErr(e2.message)
                       }
                     }}
-                    className="text-xs text-slate-500 hover:underline"
+                    className="text-xs text-slate-500 hover:underline dark:text-slate-400"
                   >
                     {r.active ? 'Desativar' : 'Ativar'}
                   </button>
@@ -417,11 +417,11 @@ export default function MembersPanel({ churchId }) {
                       setEditingRecipient(r.id)
                       setRecipientForm({ name: r.name, phone: r.phone })
                     }}
-                    className="text-xs text-blue-500 hover:underline"
+                    className="text-xs text-blue-500 hover:underline dark:text-blue-400"
                   >
                     Editar
                   </button>
-                  <button onClick={() => removeRecipient(r)} className="text-xs text-red-500 hover:underline">
+                  <button onClick={() => removeRecipient(r)} className="text-xs text-red-500 hover:underline dark:text-red-400">
                     Remover
                   </button>
                 </div>
@@ -441,31 +441,31 @@ export default function MembersPanel({ churchId }) {
           <button onClick={saveTime} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
             Salvar horário
           </button>
-          <span className="mx-1 hidden h-5 w-px bg-slate-200 sm:block" />
-          <button onClick={showToday} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          <span className="mx-1 hidden h-5 w-px bg-slate-200 dark:bg-slate-700 sm:block" />
+          <button onClick={showToday} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700">
             ANIVERSARIANTES DE HOJE
           </button>
           <button
             onClick={runTest}
             disabled={testing}
-            className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+            className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100 disabled:opacity-50 dark:border-blue-700 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-800/60"
           >
             {testing ? 'Enviando...' : 'TESTAR LEMBRETE'}
           </button>
         </div>
 
         {todayList && (
-          <div className="mt-3 rounded-lg border border-pink-200 bg-pink-50 p-3">
-            <p className="text-sm font-semibold text-pink-700">
+          <div className="mt-3 rounded-lg border border-pink-200 bg-pink-50 p-3 dark:border-pink-800 dark:bg-pink-950/40">
+            <p className="text-sm font-semibold text-pink-700 dark:text-pink-300">
               🎂 Hoje — {new Date().toLocaleDateString('pt-BR')}
             </p>
             {todayList.length === 0 ? (
-              <p className="mt-1 text-xs text-slate-500">Nenhum aniversariante hoje.</p>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Nenhum aniversariante hoje.</p>
             ) : (
               <ul className="mt-1 space-y-0.5">
                 {todayList.map((t, i) => (
-                  <li key={i} className="text-sm text-slate-700">
-                    {t.name} <span className="text-xs text-slate-400">({t.birthday})</span>
+                  <li key={i} className="text-sm text-slate-700 dark:text-slate-300">
+                    {t.name} <span className="text-xs text-slate-400 dark:text-slate-500">({t.birthday})</span>
                   </li>
                 ))}
               </ul>
@@ -480,35 +480,35 @@ export default function MembersPanel({ churchId }) {
         subtitle="Um registro por destinatário. Pendente = tentaremos de novo no mesmo dia."
       >
         {logs.length === 0 ? (
-          <p className="py-4 text-center text-xs text-slate-400">Nenhum lembrete enviado ainda.</p>
+          <p className="py-4 text-center text-xs text-slate-400 dark:text-slate-500">Nenhum lembrete enviado ainda.</p>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-slate-100">
-            <table className="min-w-full divide-y divide-slate-100">
-              <thead className="bg-slate-50">
+          <div className="overflow-x-auto rounded-lg border border-slate-100 dark:border-slate-700">
+            <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
+              <thead className="bg-slate-50 dark:bg-slate-800">
                 <tr>
-                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">Data / Hora</th>
-                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">Aniversariante(s)</th>
-                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">Destinatário</th>
-                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400">Status</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Data / Hora</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Aniversariante(s)</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Destinatário</th>
+                  <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50 bg-white">
+              <tbody className="divide-y divide-slate-50 bg-white dark:divide-slate-700 dark:bg-slate-900">
                 {logs.map((l) => (
                   <tr key={l.id}>
-                    <td className="whitespace-nowrap px-3 py-2 text-xs text-slate-500">
+                    <td className="whitespace-nowrap px-3 py-2 text-xs text-slate-500 dark:text-slate-400">
                       {l.ref_date?.split('-')?.reverse()?.join('/')} {l.sent_at ? `· ${fmtDateTime(l.sent_at).split(' ')[1]}` : ''}
                       {l.kind === 'teste' && (
-                        <span className="ml-2 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-medium text-indigo-600">teste</span>
+                        <span className="ml-2 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-medium text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-300">teste</span>
                       )}
                     </td>
-                    <td className="px-3 py-2 text-sm text-slate-700">{l.members_text}</td>
-                    <td className="px-3 py-2 text-sm text-slate-600">
+                    <td className="px-3 py-2 text-sm text-slate-700 dark:text-slate-300">{l.members_text}</td>
+                    <td className="px-3 py-2 text-sm text-slate-600 dark:text-slate-400">
                       {l.recipient_name || '(sem nome)'}
-                      <span className="ml-1 text-xs text-slate-400">({l.phone})</span>
+                      <span className="ml-1 text-xs text-slate-400 dark:text-slate-500">({l.phone})</span>
                       {l.error && <p className="mt-0.5 max-w-xs truncate text-[10px] text-red-400" title={l.error}>{l.error}</p>}
                     </td>
                     <td className="px-3 py-2">
-                      <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium capitalize ${STATUS_BADGE[l.status] || 'bg-slate-100 text-slate-600'}`}>
+                      <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium capitalize ${STATUS_BADGE[l.status] || 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400'}`}>
                         {l.status}
                       </span>
                     </td>
@@ -520,8 +520,8 @@ export default function MembersPanel({ churchId }) {
         )}
       </SectionCard>
 
-      {err && <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600">{err}</p>}
-      {notice && <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-700">{notice}</p>}
+      {err && <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600 dark:border-red-800 dark:bg-red-950/40 dark:text-red-400">{err}</p>}
+      {notice && <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400">{notice}</p>}
     </div>
   )
 }
