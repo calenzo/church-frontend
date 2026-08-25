@@ -1,19 +1,17 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api.js'
 import NumbersManager from './NumbersManager.jsx'
+import { btnPrimary, btnSecondary, inputCls } from '../ui.js'
 
 function Field({ label, hint, children }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-sm font-medium text-slate-700">{label}</span>
+      <span className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">{label}</span>
       {children}
-      {hint && <span className="mt-1 block text-xs text-slate-400">{hint}</span>}
+      {hint && <span className="mt-1 block text-xs text-slate-400 dark:text-slate-500">{hint}</span>}
     </label>
   )
 }
-
-const inputCls =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200'
 
 export default function ConfigPanel({ churchId }) {
   const [form, setForm] = useState(null)
@@ -27,7 +25,8 @@ export default function ConfigPanel({ churchId }) {
     api.getConfig(churchId).then(setForm).catch(() => setForm(null))
   }, [churchId])
 
-  if (!form) return <p className="text-sm text-slate-500">Carregando configuracoes...</p>
+  if (!form)
+    return <p className="text-sm text-slate-500 dark:text-slate-400">Carregando configuracoes...</p>
 
   const set = (field) => (e) => setForm({ ...form, [field]: e.target.value })
 
@@ -64,17 +63,17 @@ export default function ConfigPanel({ churchId }) {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-1 text-base font-semibold text-slate-900">Contato principal da igreja</h2>
-        <p className="mb-4 text-sm text-slate-500">
+      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h2 className="mb-1 text-base font-semibold text-slate-900 dark:text-slate-100">Contato principal da igreja</h2>
+        <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
           Conecte o WhatsApp escaneando o QR code ou usando o codigo de pareamento por telefone.
         </p>
         <NumbersManager churchId={churchId} />
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-1 text-base font-semibold text-slate-900">LLM</h2>
-        <p className="mb-4 text-sm text-slate-500">
+      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h2 className="mb-1 text-base font-semibold text-slate-900 dark:text-slate-100">LLM</h2>
+        <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
           Qualquer API compativel com OpenAI funciona aqui (online, ex.: OpenAI, Groq, Mistral).
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -98,28 +97,30 @@ export default function ConfigPanel({ churchId }) {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <button
-            onClick={save}
-            disabled={saving}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-          >
+          <button onClick={save} disabled={saving} className={btnPrimary}>
             {saving ? 'Salvando...' : 'Salvar configuracoes'}
           </button>
-          <button
-            onClick={test}
-            disabled={testing}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-          >
+          <button onClick={test} disabled={testing} className={btnSecondary}>
             {testing ? 'Testando...' : 'Testar conexao'}
           </button>
           {msg && (
-            <span className={`text-sm ${msg.type === 'ok' ? 'text-emerald-600' : 'text-red-600'}`}>{msg.text}</span>
+            <span
+              className={`text-sm ${
+                msg.type === 'ok'
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-red-600 dark:text-red-400'
+              }`}
+            >
+              {msg.text}
+            </span>
           )}
         </div>
         {testResult && (
           <div
             className={`mt-4 rounded-lg border p-3 text-sm ${
-              testResult.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-red-200 bg-red-50 text-red-700'
+              testResult.ok
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300'
+                : 'border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400'
             }`}
           >
             {testResult.text}

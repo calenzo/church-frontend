@@ -10,13 +10,16 @@ import LandingPage from './components/LandingPage.jsx'
 import LoginPage from './components/LoginPage.jsx'
 import MessagesPanel from './components/MessagesPanel.jsx'
 import NumbersManager from './components/NumbersManager.jsx'
+import ThemeToggle from './components/ThemeToggle.jsx'
 
 function StatusDot({ label, value }) {
   const ok = value === 'ok' || value === 'open'
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
-        ok ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+        ok
+          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
+          : 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400'
       }`}
       title={value}
     >
@@ -75,8 +78,8 @@ function AdminRoot() {
 
   if (user === undefined) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100">
-        <p className="text-sm text-slate-500">Carregando...</p>
+      <div className="flex min-h-screen items-center justify-center bg-slate-100 dark:bg-slate-950">
+        <p className="text-sm text-slate-500 dark:text-slate-400">Carregando...</p>
       </div>
     )
   }
@@ -108,19 +111,22 @@ function SuperAdminArea({ onLogout }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <header className="border-b border-slate-200 bg-white">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
+      <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4 py-4">
           <div>
-            <h1 className="text-lg font-bold text-slate-900">Administração</h1>
-            <p className="text-sm text-slate-500">Gestão das igrejas da plataforma</p>
+            <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100">Administração</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Gestão das igrejas da plataforma</p>
           </div>
-          <button
-            onClick={onLogout}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
-          >
-            Sair
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button
+              onClick={onLogout}
+              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+            >
+              Sair
+            </button>
+          </div>
         </div>
       </header>
 
@@ -181,12 +187,12 @@ function ChurchArea({ user = null, churchId = null, churchName = '', onBack = nu
 
   if (err && !church) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
-        <div className="w-full max-w-sm rounded-xl border border-red-200 bg-white p-6 text-center shadow-sm">
-          <p className="mb-4 text-sm text-red-700">{err}</p>
+      <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4 dark:bg-slate-950">
+        <div className="w-full max-w-sm rounded-xl border border-red-200 bg-white p-6 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <p className="mb-4 text-sm text-red-700 dark:text-red-400">{err}</p>
           <button
             onClick={onLogout}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
           >
             Sair
           </button>
@@ -196,23 +202,23 @@ function ChurchArea({ user = null, churchId = null, churchName = '', onBack = nu
   }
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      <header className="border-b border-slate-200 bg-white">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
+      <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4 py-3">
           <div className="flex min-w-0 items-center gap-3">
             {onBack && (
               <button
                 onClick={onBack}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               >
                 ← Voltar
               </button>
             )}
             <div className="min-w-0">
-              <h1 className="truncate text-lg font-bold text-slate-900">
+              <h1 className="truncate text-lg font-bold text-slate-900 dark:text-slate-100">
                 {church?.name || 'Minha igreja'}
               </h1>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 {onBack ? 'Operando como administrador da plataforma' : 'Painel da igreja'}
                 {user?.email ? ` — ${user.email}` : ''}
               </p>
@@ -226,13 +232,14 @@ function ChurchArea({ user = null, churchId = null, churchName = '', onBack = nu
               </>
             )}
             {!status && activeChurchId && (
-              <span className="rounded-full bg-slate-200 px-2.5 py-1 text-xs text-slate-500">
+              <span className="rounded-full bg-slate-200 px-2.5 py-1 text-xs text-slate-500 dark:bg-slate-800 dark:text-slate-400">
                 Verificando...
               </span>
             )}
+            <ThemeToggle />
             <button
               onClick={onLogout}
-              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
             >
               Sair
             </button>
@@ -245,8 +252,8 @@ function ChurchArea({ user = null, churchId = null, churchName = '', onBack = nu
               onClick={() => setTab(t.id)}
               className={`-mb-px whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition ${
                 tab === t.id
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
+                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+                  : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
             >
               {t.label}
@@ -257,12 +264,12 @@ function ChurchArea({ user = null, churchId = null, churchName = '', onBack = nu
 
       <main className="mx-auto max-w-5xl px-4 py-6" key={activeChurchId}>
         {!activeChurchId ? (
-          <p className="text-sm text-slate-500">Carregando igreja...</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Carregando igreja...</p>
         ) : (
           <>
             {tab === 'numbers' && (
-              <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 className="mb-4 text-base font-semibold text-slate-900">Números do WhatsApp</h2>
+              <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <h2 className="mb-4 text-base font-semibold text-slate-900 dark:text-slate-100">Números do WhatsApp</h2>
                 <NumbersManager churchId={activeChurchId} canManage onChanged={() => {}} />
               </section>
             )}

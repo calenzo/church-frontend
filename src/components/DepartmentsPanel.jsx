@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../api.js'
-
-const inputCls =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200'
+import { btnPrimary, btnSecondary, inputCls } from '../ui.js'
 
 const emptyForm = { name: '', description: '', group_name: '', group_jid: '', active: true }
 
@@ -147,50 +145,51 @@ export default function DepartmentsPanel({ churchId }) {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold text-slate-900">Departamentos e grupos</h2>
-            <p className="text-sm text-slate-500">
+            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Departamentos e grupos</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               Mensagens sao classificadas pela LLM e encaminhadas ao grupo do departamento.
             </p>
           </div>
-          <button
-            onClick={startNew}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
+          <button onClick={startNew} className={btnPrimary}>
             + Novo departamento
           </button>
         </div>
 
-        {err && <p className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{err}</p>}
+        {err && (
+          <p className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">
+            {err}
+          </p>
+        )}
 
         {editing && (
-          <form onSubmit={submit} className="mb-6 space-y-4 rounded-lg border border-blue-200 bg-blue-50/50 p-4">
-            <h3 className="text-sm font-semibold text-slate-800">
+          <form onSubmit={submit} className="mb-6 space-y-4 rounded-lg border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-500/30 dark:bg-blue-500/5">
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
               {editing === 'new' ? 'Novo departamento' : 'Editar departamento'}
             </h3>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Nome</label>
+                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Nome</label>
                 <input className={inputCls} required value={form.name} onChange={set('name')} placeholder="Ex.: Louvor" />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Nome do grupo no WhatsApp</label>
+                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Nome do grupo no WhatsApp</label>
                 <input className={inputCls} value={form.group_name} onChange={set('group_name')} placeholder="Ex.: Grupo Louvor 2026" />
               </div>
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-sm font-medium text-slate-700">Descricao (ajuda a LLM a classificar)</label>
+                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Descricao (ajuda a LLM a classificar)</label>
                 <input className={inputCls} value={form.description} onChange={set('description')} placeholder="Ex.: Equipe de musica, instrumentos e ministerio" />
               </div>
               <div className="relative" ref={groupRef}>
                 <div className="mb-1 flex items-center justify-between">
-                  <label className="text-sm font-medium text-slate-700">Grupo do WhatsApp</label>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Grupo do WhatsApp</label>
                   <button
                     type="button"
                     onClick={() => loadGroups(2, true)}
                     disabled={groupsLoading}
-                    className="text-xs text-blue-500 hover:underline disabled:opacity-40"
+                    className="text-xs text-blue-500 hover:underline disabled:opacity-40 dark:text-blue-400"
                   >
                     {groupsLoading ? 'Atualizando...' : 'Atualizar lista'}
                   </button>
@@ -198,11 +197,11 @@ export default function DepartmentsPanel({ churchId }) {
 
                 {selectedGroup ? (
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900">
+                    <div className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
                       {selectedGroup.subject}
-                      <span className="ml-2 text-xs text-slate-400">{selectedGroup.id}</span>
+                      <span className="ml-2 text-xs text-slate-400 dark:text-slate-500">{selectedGroup.id}</span>
                     </div>
-                    <button type="button" onClick={clearGroup} className="text-xs text-red-500 hover:underline">
+                    <button type="button" onClick={clearGroup} className="text-xs text-red-500 hover:underline dark:text-red-400">
                       Limpar
                     </button>
                   </div>
@@ -224,23 +223,23 @@ export default function DepartmentsPanel({ churchId }) {
                       disabled={groupsLoading}
                     />
                     {groupOpen && (
-                      <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+                      <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-800">
                         {groupsLoading && (
-                          <li className="px-3 py-2 text-sm text-slate-400">Carregando...</li>
+                          <li className="px-3 py-2 text-sm text-slate-400 dark:text-slate-500">Carregando...</li>
                         )}
                         {!groupsLoading && filteredGroups.length === 0 && (
-                          <li className="px-3 py-2 text-sm text-slate-400">
+                          <li className="px-3 py-2 text-sm text-slate-400 dark:text-slate-500">
                             {groupSearch ? 'Nenhum grupo encontrado' : 'Nenhum grupo disponivel'}
                           </li>
                         )}
                         {filteredGroups.map((g) => (
                           <li
                             key={g.id}
-                            className="cursor-pointer px-3 py-2 text-sm hover:bg-blue-50"
+                            className="cursor-pointer px-3 py-2 text-sm hover:bg-blue-50 dark:hover:bg-slate-700"
                             onClick={() => selectGroup(g)}
                           >
-                            <div className="font-medium text-slate-900">{g.subject}</div>
-                            <div className="text-xs text-slate-400">{g.id}</div>
+                            <div className="font-medium text-slate-900 dark:text-slate-100">{g.subject}</div>
+                            <div className="text-xs text-slate-400 dark:text-slate-500">{g.id}</div>
                           </li>
                         ))}
                       </ul>
@@ -249,7 +248,7 @@ export default function DepartmentsPanel({ churchId }) {
                 )}
 
                 {groupsErr && (
-                  <div className="mt-1 flex items-center gap-2 text-xs text-red-600">
+                  <div className="mt-1 flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
                     <span>Falha ao carregar grupos: {groupsErr}</span>
                     <button type="button" onClick={() => loadGroups()} className="font-medium underline hover:no-underline">
                       Tentar novamente
@@ -257,29 +256,29 @@ export default function DepartmentsPanel({ churchId }) {
                   </div>
                 )}
                 {!groupsErr && !groupsLoading && groups.length === 0 && (
-                  <p className="mt-1 text-xs text-slate-400">
+                  <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
                     Nenhum grupo encontrado. Confira se o numero esta conectado (aba Numeros) e,
                     se o grupo foi criado agora, aguarde alguns segundos e clique em "Atualizar lista".
                   </p>
                 )}
                 {!groupsErr && !groupsLoading && groups.length > 0 && groupsLoadedAt > 0 && (
-                  <p className="mt-1 text-xs text-slate-400">
+                  <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
                     Lista carregada as {new Date(groupsLoadedAt).toLocaleTimeString()} com os grupos
                     da conexao ativa.
                   </p>
                 )}
                 {form.group_name && selectedGroup && (
-                  <span className="mt-1 block text-xs text-slate-400">
-                    Grupo vinculado: <span className="font-medium text-slate-600">{form.group_name}</span>
+                  <span className="mt-1 block text-xs text-slate-400 dark:text-slate-500">
+                    Grupo vinculado: <span className="font-medium text-slate-600 dark:text-slate-300">{form.group_name}</span>
                   </span>
                 )}
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <button type="submit" className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+              <button type="submit" className={btnPrimary}>
                 Salvar
               </button>
-              <button type="button" onClick={cancel} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+              <button type="button" onClick={cancel} className={btnSecondary}>
                 Cancelar
               </button>
             </div>
@@ -287,16 +286,16 @@ export default function DepartmentsPanel({ churchId }) {
         )}
 
         {loading ? (
-          <p className="text-sm text-slate-500">Carregando...</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Carregando...</p>
         ) : departments.length === 0 ? (
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Nenhum departamento cadastrado. Clique em "+ Novo departamento" para comecar.
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-400">
+                <tr className="border-b border-slate-200 text-xs tracking-wide text-slate-400 uppercase dark:border-slate-700 dark:text-slate-500">
                   <th className="py-2 pr-4">Departamento</th>
                   <th className="py-2 pr-4">Grupo / JID</th>
                   <th className="py-2 pr-4">Ativo</th>
@@ -305,12 +304,12 @@ export default function DepartmentsPanel({ churchId }) {
               </thead>
               <tbody>
                 {departments.map((dep) => (
-                  <tr key={dep.id} className="border-b border-slate-100 align-top">
+                  <tr key={dep.id} className="border-b border-slate-100 align-top dark:border-slate-800">
                     <td className="py-3 pr-4">
-                      <div className="font-medium text-slate-900">{dep.name}</div>
+                      <div className="font-medium text-slate-900 dark:text-slate-100">{dep.name}</div>
                       {dep.description && (
                         <div
-                          className="line-clamp-2 max-w-sm break-words text-xs text-slate-500"
+                          className="line-clamp-2 max-w-sm break-words text-xs text-slate-500 dark:text-slate-400"
                           title={dep.description}
                         >
                           {dep.description}
@@ -318,18 +317,18 @@ export default function DepartmentsPanel({ churchId }) {
                       )}
                     </td>
                     <td className="py-3 pr-4">
-                      {dep.group_name && <div className="text-slate-700">{dep.group_name}</div>}
+                      {dep.group_name && <div className="text-slate-700 dark:text-slate-300">{dep.group_name}</div>}
                       {dep.group_jid ? (
-                        <code className="text-xs text-slate-500">{dep.group_jid}</code>
+                        <code className="text-xs text-slate-500 dark:text-slate-400">{dep.group_jid}</code>
                       ) : (
-                        <span className="text-xs text-amber-600">Sem grupo configurado</span>
+                        <span className="text-xs text-amber-600 dark:text-amber-400">Sem grupo configurado</span>
                       )}
                     </td>
                     <td className="py-3 pr-4">
                       {dep.active ? (
-                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">Ativo</span>
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">Ativo</span>
                       ) : (
-                        <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs text-slate-600">Inativo</span>
+                        <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-400">Inativo</span>
                       )}
                     </td>
                     <td className="py-3 text-right">
@@ -337,20 +336,20 @@ export default function DepartmentsPanel({ churchId }) {
                         <button
                           onClick={() => testSend(dep)}
                           disabled={!dep.group_jid || testMsg[dep.id]?.busy}
-                          className="text-xs font-medium text-blue-600 hover:underline disabled:opacity-40 disabled:hover:no-underline"
+                          className="text-xs font-medium text-blue-600 hover:underline disabled:opacity-40 disabled:hover:no-underline dark:text-blue-400"
                           title={dep.group_jid ? 'Enviar mensagem de teste ao grupo' : 'Configure o JID do grupo primeiro'}
                         >
                           {testMsg[dep.id]?.busy ? 'Enviando...' : 'Testar'}
                         </button>
-                        <button onClick={() => startEdit(dep)} className="text-xs font-medium text-slate-500 hover:underline">
+                        <button onClick={() => startEdit(dep)} className="text-xs font-medium text-slate-500 hover:underline dark:text-slate-400">
                           Editar
                         </button>
-                        <button onClick={() => remove(dep)} className="text-xs font-medium text-red-600 hover:underline">
+                        <button onClick={() => remove(dep)} className="text-xs font-medium text-red-600 hover:underline dark:text-red-400">
                           Excluir
                         </button>
                       </div>
                       {testMsg[dep.id]?.text && (
-                        <div className="mt-1 text-xs text-slate-500">{testMsg[dep.id].text}</div>
+                        <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">{testMsg[dep.id].text}</div>
                       )}
                     </td>
                   </tr>
@@ -361,8 +360,8 @@ export default function DepartmentsPanel({ churchId }) {
         )}
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-600 shadow-sm">
-        <h3 className="mb-2 text-base font-semibold text-slate-900">Grupo do WhatsApp</h3>
+      <section className="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+        <h3 className="mb-2 text-base font-semibold text-slate-900 dark:text-slate-100">Grupo do WhatsApp</h3>
         <p className="text-sm">
           Selecione o grupo na lista acima. A lista e carregada direto da instancia conectada na Evolution API
           (cada departamento recebe as mensagens classificadas pela LLM). O campo "Nome do grupo" e preenchido automaticamente.

@@ -5,7 +5,7 @@ const tabCls = (active) =>
   `px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
     active
       ? 'bg-emerald-600 text-white shadow-sm'
-      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
   }`
 
 export default function QrPanel({ number, onStateChange }) {
@@ -76,17 +76,17 @@ export default function QrPanel({ number, onStateChange }) {
     return (
       <div>
         <ModeTabs mode={mode} setMode={setMode} />
-        {err && <p className="mt-3 text-sm text-red-700">Nao foi possivel obter o QR code: {err}</p>}
+        {err && <p className="mt-3 text-sm text-red-700 dark:text-red-400">Nao foi possivel obter o QR code: {err}</p>}
         {!qr && !err && (
-          <p className="mt-4 text-sm text-slate-400">Carregando QR code...</p>
+          <p className="mt-4 text-sm text-slate-400 dark:text-slate-500">Carregando QR code...</p>
         )}
         {qr && (
           <>
-            <p className="mt-4 mb-3 text-sm text-slate-500">
+            <p className="mt-4 mb-3 text-sm text-slate-500 dark:text-slate-400">
               Escaneie o QR code abaixo com o WhatsApp (Ajustes &gt; Aparelhos conectados &gt; Conectar aparelho).
             </p>
-            <img src={qr} alt="QR code para conectar o WhatsApp" className="h-56 w-56 rounded-lg border border-slate-200" />
-            <p className="mt-3 text-xs text-slate-400">Atualiza automaticamente a cada 5 segundos.</p>
+            <img src={qr} alt="QR code para conectar o WhatsApp" className="h-56 w-56 rounded-lg border border-slate-200 bg-white p-1 dark:border-slate-700" />
+            <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">Atualiza automaticamente a cada 5 segundos.</p>
           </>
         )}
       </div>
@@ -137,7 +137,7 @@ function DisconnectButton({ numberId, onDisconnected }) {
     <div className="flex flex-wrap items-center gap-2">
       {confirming ? (
         <>
-          <span className="text-sm text-slate-500">Desconectar este WhatsApp?</span>
+          <span className="text-sm text-slate-500 dark:text-slate-400">Desconectar este WhatsApp?</span>
           <button
             onClick={disconnect}
             disabled={loading}
@@ -148,7 +148,7 @@ function DisconnectButton({ numberId, onDisconnected }) {
           <button
             onClick={() => setConfirming(false)}
             disabled={loading}
-            className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 disabled:opacity-50"
+            className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 disabled:opacity-50 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
           >
             Cancelar
           </button>
@@ -156,12 +156,12 @@ function DisconnectButton({ numberId, onDisconnected }) {
       ) : (
         <button
           onClick={() => setConfirming(true)}
-          className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+          className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-500/40 dark:text-red-400 dark:hover:bg-red-500/10"
         >
           Desconectar
         </button>
       )}
-      {err && <p className="w-full text-sm text-red-700">{err}</p>}
+      {err && <p className="w-full text-sm text-red-700 dark:text-red-400">{err}</p>}
     </div>
   )
 }
@@ -199,7 +199,7 @@ function PairingForm({ numberId, onQrFallback }) {
 
   return (
     <div className="mt-4 space-y-3">
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-slate-500 dark:text-slate-400">
         Digite o numero de telefone da igreja para gerar um codigo de pareamento. No celular, vá em Ajustes &gt; Aparelhos conectados &gt; Conectar aparelho &gt; Conectar com numero do telefone.
       </p>
       <div className="flex gap-2">
@@ -208,7 +208,7 @@ function PairingForm({ numberId, onQrFallback }) {
           placeholder="5511999999999"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+          className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
         />
         <button
           onClick={generate}
@@ -218,12 +218,12 @@ function PairingForm({ numberId, onQrFallback }) {
           {loading ? 'Gerando...' : 'Gerar codigo'}
         </button>
       </div>
-      {err && <p className="text-sm text-red-700">{err}</p>}
+      {err && <p className="text-sm text-red-700 dark:text-red-400">{err}</p>}
       {code && (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-center">
-          <p className="text-xs text-slate-500">Seu codigo de pareamento:</p>
-          <p className="mt-1 text-2xl font-bold tracking-widest text-emerald-700">{code}</p>
-          <p className="mt-2 text-xs text-slate-400">Digite este codigo no celular para conectar.</p>
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-center dark:border-emerald-500/30 dark:bg-emerald-500/10">
+          <p className="text-xs text-slate-500 dark:text-slate-400">Seu codigo de pareamento:</p>
+          <p className="mt-1 text-2xl font-bold tracking-widest text-emerald-700 dark:text-emerald-400">{code}</p>
+          <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">Digite este codigo no celular para conectar.</p>
         </div>
       )}
     </div>

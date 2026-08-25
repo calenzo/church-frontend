@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api.js'
-
-const inputCls =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200'
+import { btnPrimary, btnSecondary, inputCls } from '../ui.js'
 
 const emptyForm = {
   name: '',
@@ -37,18 +35,18 @@ function ContactSheet({ contact }) {
     ['Última intenção', contact.last_intent],
   ].filter(([, v]) => v && String(v).trim())
   return (
-    <div className="rounded-md border border-slate-200 bg-white p-2.5 text-[11px] text-slate-600">
+    <div className="rounded-md border border-slate-200 bg-white p-2.5 text-[11px] text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
       <div className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-3">
         {rows.map(([k, v]) => (
           <p key={k} className="truncate" title={String(v)}>
-            <span className="font-semibold uppercase tracking-wide text-slate-400">{k}: </span>
+            <span className="font-semibold tracking-wide text-slate-400 uppercase dark:text-slate-500">{k}: </span>
             {v}
           </p>
         ))}
       </div>
       {contact.resumo_contexto && (
-        <p className="mt-1.5 border-t border-slate-100 pt-1.5">
-          <span className="font-semibold uppercase tracking-wide text-slate-400">Resumo do contexto: </span>
+        <p className="mt-1.5 border-t border-slate-100 pt-1.5 dark:border-slate-800">
+          <span className="font-semibold tracking-wide text-slate-400 uppercase dark:text-slate-500">Resumo do contexto: </span>
           {contact.resumo_contexto}
         </p>
       )}
@@ -86,11 +84,11 @@ function MemorySection({ contact, onErr }) {
   const badge = (m) =>
     m.kind === 'pendencia'
       ? m.status === 'resolvida'
-        ? 'bg-emerald-100 text-emerald-700'
-        : 'bg-amber-100 text-amber-700'
+        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
+        : 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400'
       : m.kind === 'fato'
-        ? 'bg-blue-100 text-blue-700'
-        : 'bg-slate-100 text-slate-600'
+        ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400'
+        : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
 
   const add = async (e) => {
     e.preventDefault()
@@ -154,7 +152,9 @@ function MemorySection({ contact, onErr }) {
         {m.memory_type === 'temporaria' && (
           <span
             className={`mr-2 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-              isExpired(m) ? 'bg-red-100 text-red-600' : 'bg-purple-100 text-purple-700'
+              isExpired(m)
+                ? 'bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400'
+                : 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400'
             }`}
             title={m.expires_at ? `Válida até ${fmtDate(m.expires_at)}` : 'Memória temporária'}
           >
@@ -162,16 +162,22 @@ function MemorySection({ contact, onErr }) {
             {m.expires_at && !isExpired(m) ? ` · até ${fmtDate(m.expires_at)}` : ''}
           </span>
         )}
-        <span className={`text-xs ${isExpired(m) ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{m.content}</span>
-        {m.responsible && <span className="ml-1 text-[10px] text-slate-400">({m.responsible})</span>}
+        <span
+          className={`text-xs ${
+            isExpired(m) ? 'text-slate-400 line-through dark:text-slate-600' : 'text-slate-700 dark:text-slate-200'
+          }`}
+        >
+          {m.content}
+        </span>
+        {m.responsible && <span className="ml-1 text-[10px] text-slate-400 dark:text-slate-500">({m.responsible})</span>}
       </div>
       <div className="flex shrink-0 gap-2">
         {m.kind === 'pendencia' && (
-          <button onClick={() => togglePendencia(m)} className="text-[11px] text-emerald-600 hover:underline">
+          <button onClick={() => togglePendencia(m)} className="text-[11px] text-emerald-600 hover:underline dark:text-emerald-400">
             {m.status === 'resolvida' ? 'Reabrir' : 'Resolver'}
           </button>
         )}
-        <button onClick={() => removeMem(m.id)} className="text-[11px] text-red-500 hover:underline">
+        <button onClick={() => removeMem(m.id)} className="text-[11px] text-red-500 hover:underline dark:text-red-400">
           Apagar
         </button>
       </div>
@@ -179,11 +185,11 @@ function MemorySection({ contact, onErr }) {
   )
 
   return (
-    <div className="mt-3 space-y-3 rounded-lg border border-slate-200 bg-slate-50/60 p-3">
+    <div className="mt-3 space-y-3 rounded-lg border border-slate-200 bg-slate-50/60 p-3 dark:border-slate-700 dark:bg-slate-800/40">
       <ContactSheet contact={contact} />
 
       {contact.memory_locked && (
-        <p className="text-[11px] font-medium text-orange-600">
+        <p className="text-[11px] font-medium text-orange-600 dark:text-orange-400">
           Memória automática bloqueada — a IA não grava novos fatos deste contato.
         </p>
       )}
@@ -231,32 +237,32 @@ function MemorySection({ contact, onErr }) {
       </form>
 
       {loading ? (
-        <p className="text-xs text-slate-400">Carregando memória...</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500">Carregando memória...</p>
       ) : memories.length === 0 ? (
-        <p className="text-xs text-slate-400">Nenhuma memória registrada ainda.</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500">Nenhuma memória registrada ainda.</p>
       ) : (
         <div className="space-y-2">
           {pendentes.length > 0 && (
             <div>
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Pendências abertas</p>
+              <p className="mb-1 text-[11px] font-semibold tracking-wide text-slate-400 uppercase dark:text-slate-500">Pendências abertas</p>
               {pendentes.map(item)}
             </div>
           )}
           {ativos.length > 0 && (
             <div>
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Fatos &amp; observações</p>
+              <p className="mb-1 text-[11px] font-semibold tracking-wide text-slate-400 uppercase dark:text-slate-500">Fatos &amp; observações</p>
               {ativos.map(item)}
             </div>
           )}
           {resolvidas.length > 0 && (
             <div>
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Resolvidas</p>
+              <p className="mb-1 text-[11px] font-semibold tracking-wide text-slate-400 uppercase dark:text-slate-500">Resolvidas</p>
               {resolvidas.map(item)}
             </div>
           )}
           {expiradas.length > 0 && (
             <div>
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+              <p className="mb-1 text-[11px] font-semibold tracking-wide text-slate-400 uppercase dark:text-slate-500">
                 Expiradas (a IA não usa mais como informação atual)
               </p>
               {expiradas.map(item)}
@@ -265,7 +271,7 @@ function MemorySection({ contact, onErr }) {
         </div>
       )}
 
-      <button onClick={clearAuto} className="text-[11px] text-red-500 hover:underline">
+      <button onClick={clearAuto} className="text-[11px] text-red-500 hover:underline dark:text-red-400">
         Limpar memória automática
       </button>
     </div>
@@ -353,11 +359,11 @@ export default function ContactsPanel({ churchId }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-slate-200 bg-white p-4">
+      <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-semibold text-slate-900">Contatos da Igreja</h3>
-            <p className="mt-1 text-xs text-slate-500">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Contatos da Igreja</h3>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
               Cadastre aqui os números de membros e líderes. A IA usa esta base para
               reconhecer quem está falando no WhatsApp (nome e cargo) e responder sem inventar informações.
               Números fora desta lista são tratados com identidade desconhecida.
@@ -371,42 +377,42 @@ export default function ContactsPanel({ churchId }) {
               placeholder="Buscar nome ou número..."
               className={`${inputCls} w-56`}
             />
-            <button onClick={() => load()} className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">
+            <button
+              onClick={() => load()}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            >
               Buscar
             </button>
           </div>
         </div>
 
         {!editing && (
-          <button
-            onClick={startNew}
-            className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
+          <button onClick={startNew} className={`mt-4 ${btnPrimary}`}>
             + Novo contato
           </button>
         )}
 
         {editing && (
-          <form onSubmit={submit} className="mt-4 space-y-3 rounded-lg border border-blue-100 bg-blue-50/50 p-4">
-            <h4 className="text-sm font-semibold text-slate-800">
+          <form onSubmit={submit} className="mt-4 space-y-3 rounded-lg border border-blue-100 bg-blue-50/50 p-4 dark:border-blue-500/30 dark:bg-blue-500/5">
+            <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
               {editing === 'new' ? 'Novo contato' : 'Editar contato'}
             </h4>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <label className="text-xs font-medium text-slate-600">
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-300">
                 Nome
                 <input required value={form.name} onChange={set('name')} placeholder="Ex.: Pastor Radchem" className={`mt-1 ${inputCls}`} />
               </label>
-              <label className="text-xs font-medium text-slate-600">
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-300">
                 WhatsApp
                 <input required value={form.phone} onChange={set('phone')} placeholder="(21) 99906-9940" className={`mt-1 ${inputCls}`} />
               </label>
-              <label className="text-xs font-medium text-slate-600">
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-300">
                 Cargo / Função
                 <input value={form.role} onChange={set('role')} placeholder="Ex.: Pastor, Diácono, Líder de Louvor" className={`mt-1 ${inputCls}`} />
               </label>
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <label className="text-xs font-medium text-slate-600">
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-300">
                 Tipo de contato
                 <select value={form.contact_type} onChange={set('contact_type')} className={`mt-1 ${inputCls}`}>
                   <option value="">Não definido</option>
@@ -415,12 +421,12 @@ export default function ContactsPanel({ churchId }) {
                   ))}
                 </select>
               </label>
-              <label className="text-xs font-medium text-slate-600">
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-300">
                 Departamento / Ministério
                 <input value={form.department_name} onChange={set('department_name')} placeholder="Ex.: Secretaria, Louvor, Diaconia" className={`mt-1 ${inputCls}`} />
               </label>
             </div>
-            <label className="block text-xs font-medium text-slate-600">
+            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300">
               Resumo do contexto (a IA lê isto antes de responder)
               <textarea
                 value={form.resumo_contexto}
@@ -430,27 +436,27 @@ export default function ContactsPanel({ churchId }) {
                 className={`mt-1 ${inputCls}`}
               />
             </label>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-400 dark:text-slate-500">
               Inclua o DDI se os contatos forem de outro país. No Brasil, DDD + número já bastam (ex.: 21 99906-9940).
             </p>
             <div className="flex gap-2">
-              <button type="submit" className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+              <button type="submit" className={btnPrimary}>
                 Salvar
               </button>
-              <button type="button" onClick={cancel} className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-100">
+              <button type="button" onClick={cancel} className={btnSecondary}>
                 Cancelar
               </button>
             </div>
           </form>
         )}
 
-        {err && <p className="mt-3 text-xs text-red-500">{err}</p>}
+        {err && <p className="mt-3 text-xs text-red-500 dark:text-red-400">{err}</p>}
 
-        <div className="mt-4 divide-y divide-slate-100">
+        <div className="mt-4 divide-y divide-slate-100 dark:divide-slate-800">
           {loading ? (
-            <p className="py-6 text-center text-sm text-slate-400">Carregando...</p>
+            <p className="py-6 text-center text-sm text-slate-400 dark:text-slate-500">Carregando...</p>
           ) : contacts.length === 0 ? (
-            <p className="py-6 text-center text-sm text-slate-400">
+            <p className="py-6 text-center text-sm text-slate-400 dark:text-slate-500">
               Nenhum contato cadastrado ainda. Crie o primeiro para a IA passar a reconhecer esse número.
             </p>
           ) : (
@@ -458,24 +464,36 @@ export default function ContactsPanel({ churchId }) {
               <div key={c.id} className="py-3">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-slate-900">
+                    <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
                       {c.name}
-                      {c.role && <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-normal text-slate-600">{c.role}</span>}
-                      {c.contact_type && <span className="ml-1 rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-normal text-indigo-600">{c.contact_type}</span>}
-                      {c.department_name && <span className="ml-1 rounded-full bg-teal-50 px-2 py-0.5 text-xs font-normal text-teal-700">{c.department_name}</span>}
+                      {c.role && (
+                        <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-normal text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                          {c.role}
+                        </span>
+                      )}
+                      {c.contact_type && (
+                        <span className="ml-1 rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-normal text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
+                          {c.contact_type}
+                        </span>
+                      )}
+                      {c.department_name && (
+                        <span className="ml-1 rounded-full bg-teal-50 px-2 py-0.5 text-xs font-normal text-teal-700 dark:bg-teal-500/10 dark:text-teal-400">
+                          {c.department_name}
+                        </span>
+                      )}
                     </p>
-                    <p className="text-xs text-slate-500">{c.phone}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{c.phone}</p>
                   </div>
                   <div className="flex shrink-0 gap-2">
-                    <button onClick={toggleLock.bind(null, c)} className="text-xs text-slate-500 hover:underline" title="Bloqueia/desbloqueia a gravação automática de memória">
+                    <button onClick={toggleLock.bind(null, c)} className="text-xs text-slate-500 hover:underline dark:text-slate-400" title="Bloqueia/desbloqueia a gravação automática de memória">
                       {c.memory_locked ? 'Desbloquear memória' : 'Bloquear memória'}
                     </button>
-                    <button onClick={() => startEdit(c)} className="text-xs text-blue-500 hover:underline">Editar</button>
-                    <button onClick={() => remove(c.id)} className="text-xs text-red-500 hover:underline">Remover</button>
+                    <button onClick={() => startEdit(c)} className="text-xs text-blue-500 hover:underline dark:text-blue-400">Editar</button>
+                    <button onClick={() => remove(c.id)} className="text-xs text-red-500 hover:underline dark:text-red-400">Remover</button>
                   </div>
                 </div>
                 <details className="mt-1">
-                  <summary className="cursor-pointer select-none text-xs text-blue-500 hover:underline">
+                  <summary className="cursor-pointer text-xs text-blue-500 select-none hover:underline dark:text-blue-400">
                     Ver memória do contato
                   </summary>
                   <MemorySection contact={c} onErr={setErr} />

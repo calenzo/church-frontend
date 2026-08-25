@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api.js'
 import QrPanel from './QrPanel.jsx'
+import { inputCls, btnPrimary } from '../ui.js'
 
 const STATE_STYLE = {
-  open: 'bg-emerald-100 text-emerald-700',
-  connecting: 'bg-amber-100 text-amber-700',
+  open: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
+  connecting: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
 }
 const stateLabel = (s) => ({ open: 'Conectado', connecting: 'Conectando', close: 'Desconectado', offline: 'Evolution offline' })[s] || s || '—'
 
@@ -86,12 +87,16 @@ export default function NumbersManager({ churchId, canManage = false, onChanged 
 
   return (
     <div className="space-y-4">
-      {err && <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{err}</p>}
+      {err && (
+        <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">
+          {err}
+        </p>
+      )}
 
       {loading ? (
-        <p className="text-sm text-slate-500">Carregando numeros...</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Carregando numeros...</p>
       ) : numbers.length === 0 ? (
-        <p className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-slate-600">
+        <p className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-slate-600 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-slate-300">
           {canManage
             ? 'Nenhum numero cadastrado ainda. Adicione um numero abaixo para gerar o QR code ou o codigo de pareamento do WhatsApp.'
             : 'Nenhum numero cadastrado para esta igreja.'}
@@ -99,32 +104,36 @@ export default function NumbersManager({ churchId, canManage = false, onChanged 
       ) : (
         <div className="space-y-3">
           {numbers.map((n) => (
-            <div key={n.id} className="rounded-lg border border-slate-200">
+            <div key={n.id} className="rounded-lg border border-slate-200 dark:border-slate-700">
               <div className="flex flex-wrap items-center gap-3 p-4">
                 <div className="min-w-0 flex-1">
-                  <div className="font-medium text-slate-900">{n.label || n.instance_name}</div>
-                  <code className="text-xs text-slate-400">{n.instance_name}</code>
+                  <div className="font-medium text-slate-900 dark:text-slate-100">{n.label || n.instance_name}</div>
+                  <code className="text-xs text-slate-400 dark:text-slate-500">{n.instance_name}</code>
                 </div>
-                <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${STATE_STYLE[states[n.id]] || 'bg-slate-100 text-slate-600'}`}>
+                <span
+                  className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                    STATE_STYLE[states[n.id]] || 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+                  }`}
+                >
                   {stateLabel(states[n.id])}
                 </span>
                 <button
                   onClick={() => setOpenNumberId(openNumberId === n.id ? null : n.id)}
-                  className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
+                  className={btnPrimary}
                 >
                   {openNumberId === n.id ? 'Fechar' : states[n.id] === 'open' ? 'Gerenciar' : 'Conectar'}
                 </button>
                 {canManage && (
                   <button
                     onClick={() => removeNumber(n)}
-                    className="text-xs font-medium text-red-600 hover:underline"
+                    className="text-xs font-medium text-red-600 hover:underline dark:text-red-400"
                   >
                     Excluir
                   </button>
                 )}
               </div>
               {openNumberId === n.id && (
-                <div className="border-t border-slate-100 bg-slate-50/50 p-4">
+                <div className="border-t border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-800/40">
                   <QrPanel number={n} onStateChange={refreshStates} />
                 </div>
               )}
@@ -139,13 +148,9 @@ export default function NumbersManager({ churchId, canManage = false, onChanged 
             value={newLabel}
             onChange={(e) => setNewLabel(e.target.value)}
             placeholder="Identificacao do numero (ex.: Contato da secretaria)"
-            className="min-w-48 flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            className={`min-w-48 flex-1 ${inputCls}`}
           />
-          <button
-            type="submit"
-            disabled={creating}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-          >
+          <button type="submit" disabled={creating} className={btnPrimary}>
             {creating ? 'Criando...' : '+ Adicionar numero'}
           </button>
         </form>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ThemeToggle from './ThemeToggle.jsx'
 
 const features = [
   {
@@ -95,7 +96,7 @@ function Bubble({ from, text }) {
       <div
         className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
           isBot
-            ? 'border border-slate-100 bg-white text-slate-700 shadow-sm'
+            ? 'border border-slate-100 bg-white text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200'
             : 'bg-emerald-600 text-white'
         }`}
       >
@@ -109,52 +110,55 @@ export default function LandingPage() {
   const [sent, setSent] = useState(false)
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-slate-950">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <div className="flex items-center gap-2">
             <span className="text-2xl">⛪</span>
-            <span className="text-lg font-bold text-slate-900">IgrejaBot</span>
+            <span className="text-lg font-bold text-slate-900 dark:text-slate-100">IgrejaBot</span>
           </div>
-          <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 sm:flex">
-            <a href="#funcionalidades" className="hover:text-blue-600">Funcionalidades</a>
-            <a href="#como-funciona" className="hover:text-blue-600">Como funciona</a>
-            <a href="#precos" className="hover:text-blue-600">Preco</a>
+          <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 sm:flex dark:text-slate-300">
+            <a href="#funcionalidades" className="hover:text-blue-600 dark:hover:text-blue-400">Funcionalidades</a>
+            <a href="#como-funciona" className="hover:text-blue-600 dark:hover:text-blue-400">Como funciona</a>
+            <a href="#precos" className="hover:text-blue-600 dark:hover:text-blue-400">Preco</a>
           </nav>
-          <a
-            href="#contato"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            Testar gratis
-          </a>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <a
+              href="#contato"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              Testar gratis
+            </a>
+          </div>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="overflow-hidden bg-gradient-to-b from-blue-50 to-white pb-20 pt-20 sm:pt-28">
+      <section className="overflow-hidden bg-gradient-to-b from-blue-50 to-white pb-20 pt-20 sm:pt-28 dark:from-slate-900 dark:to-slate-950">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mx-auto max-w-3xl text-center">
-            <span className="mb-4 inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+            <span className="mb-4 inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">
               Inteligencia Artificial para igrejas
             </span>
-            <h1 className="mb-6 text-4xl font-bold leading-tight text-slate-900 sm:text-5xl">
+            <h1 className="mb-6 text-4xl font-bold leading-tight text-slate-900 sm:text-5xl dark:text-slate-100">
               Sua igreja nunca mais perde uma mensagem no WhatsApp
             </h1>
-            <p className="mb-8 text-lg text-slate-600">
+            <p className="mb-8 text-lg text-slate-600 dark:text-slate-400">
               O assistente inteligente que responde, classifica e encaminha automaticamente todas as
               mensagens da sua congregacao. 24 horas por dia, 7 dias por semana.
             </p>
             <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
               <a
                 href="#contato"
-                className="w-full rounded-lg bg-blue-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-blue-200 hover:bg-blue-700 sm:w-auto"
+                className="w-full rounded-lg bg-blue-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-blue-200 hover:bg-blue-700 sm:w-auto dark:shadow-none"
               >
                 Testar 14 dias gratis
               </a>
               <a
                 href="#como-funciona"
-                className="w-full rounded-lg border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-700 hover:bg-slate-50 sm:w-auto"
+                className="w-full rounded-lg border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-700 hover:bg-slate-50 sm:w-auto dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
               >
                 Ver como funciona
               </a>
@@ -163,8 +167,8 @@ export default function LandingPage() {
 
           {/* Mockup */}
           <div className="mx-auto mt-16 max-w-2xl">
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-              <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-3">
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900">
+              <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/60">
                 <div className="h-3 w-3 rounded-full bg-red-400" />
                 <div className="h-3 w-3 rounded-full bg-yellow-400" />
                 <div className="h-3 w-3 rounded-full bg-green-400" />
@@ -188,21 +192,21 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section id="funcionalidades" className="bg-white py-20">
+      <section id="funcionalidades" className="bg-white py-20 dark:bg-slate-950">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mb-12 text-center">
-            <h2 className="mb-3 text-3xl font-bold text-slate-900">Tudo que sua igreja precisa</h2>
-            <p className="text-lg text-slate-500">Automatizacao inteligente sem perder o toque humano</p>
+            <h2 className="mb-3 text-3xl font-bold text-slate-900 dark:text-slate-100">Tudo que sua igreja precisa</h2>
+            <p className="text-lg text-slate-500 dark:text-slate-400">Automatizacao inteligente sem perder o toque humano</p>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-slate-100 bg-slate-50 p-6 transition hover:shadow-md"
+                className="rounded-xl border border-slate-100 bg-slate-50 p-6 transition hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
               >
                 <div className="mb-3 text-3xl">{f.icon}</div>
-                <h3 className="mb-2 text-lg font-semibold text-slate-900">{f.title}</h3>
-                <p className="text-sm leading-relaxed text-slate-600">{f.desc}</p>
+                <h3 className="mb-2 text-lg font-semibold text-slate-900 dark:text-slate-100">{f.title}</h3>
+                <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -210,11 +214,11 @@ export default function LandingPage() {
       </section>
 
       {/* How it works */}
-      <section id="como-funciona" className="bg-slate-50 py-20">
+      <section id="como-funciona" className="bg-slate-50 py-20 dark:bg-slate-900/50">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mb-12 text-center">
-            <h2 className="mb-3 text-3xl font-bold text-slate-900">Funciona em 3 passos</h2>
-            <p className="text-lg text-slate-500">Setup simples, sem precisar de equipe tecnica</p>
+            <h2 className="mb-3 text-3xl font-bold text-slate-900 dark:text-slate-100">Funciona em 3 passos</h2>
+            <p className="text-lg text-slate-500 dark:text-slate-400">Setup simples, sem precisar de equipe tecnica</p>
           </div>
           <div className="grid gap-8 sm:grid-cols-3">
             {steps.map((s, i) => (
@@ -222,8 +226,8 @@ export default function LandingPage() {
                 <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-xl font-bold text-white">
                   {s.n}
                 </div>
-                <h3 className="mb-2 text-lg font-semibold text-slate-900">{s.title}</h3>
-                <p className="text-sm text-slate-600">{s.desc}</p>
+                <h3 className="mb-2 text-lg font-semibold text-slate-900 dark:text-slate-100">{s.title}</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -231,18 +235,18 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="bg-white py-20">
+      <section className="bg-white py-20 dark:bg-slate-950">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mb-12 text-center">
-            <h2 className="mb-3 text-3xl font-bold text-slate-900">Quem ja usa, recomenda</h2>
+            <h2 className="mb-3 text-3xl font-bold text-slate-900 dark:text-slate-100">Quem ja usa, recomenda</h2>
           </div>
           <div className="grid gap-6 sm:grid-cols-2">
             {testimonials.map((t, i) => (
-              <div key={i} className="rounded-xl border border-slate-100 bg-slate-50 p-6">
-                <p className="mb-4 text-sm leading-relaxed text-slate-600">"{t.text}"</p>
+              <div key={i} className="rounded-xl border border-slate-100 bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-900">
+                <p className="mb-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">"{t.text}"</p>
                 <div>
-                  <div className="font-semibold text-slate-900">{t.name}</div>
-                  <div className="text-xs text-slate-500">
+                  <div className="font-semibold text-slate-900 dark:text-slate-100">{t.name}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
                     {t.role} - {t.church}
                   </div>
                 </div>
@@ -253,18 +257,20 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section id="precos" className="bg-slate-50 py-20">
+      <section id="precos" className="bg-slate-50 py-20 dark:bg-slate-900/50">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mb-12 text-center">
-            <h2 className="mb-3 text-3xl font-bold text-slate-900">Simples e acessivel</h2>
-            <p className="text-lg text-slate-500">Muito menos que contratar um atendente</p>
+            <h2 className="mb-3 text-3xl font-bold text-slate-900 dark:text-slate-100">Simples e acessivel</h2>
+            <p className="text-lg text-slate-500 dark:text-slate-400">Muito menos que contratar um atendente</p>
           </div>
           <div className="mx-auto grid max-w-3xl gap-6 sm:grid-cols-2">
             {plans.map((p, i) => (
               <div
                 key={i}
                 className={`relative rounded-2xl border-2 p-6 ${
-                  p.highlight ? 'border-blue-600 bg-white shadow-xl' : 'border-slate-200 bg-white'
+                  p.highlight
+                    ? 'border-blue-600 bg-white shadow-xl dark:bg-slate-900'
+                    : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
                 }`}
               >
                 {p.highlight && (
@@ -272,15 +278,15 @@ export default function LandingPage() {
                     Mais popular
                   </div>
                 )}
-                <h3 className="text-lg font-bold text-slate-900">{p.name}</h3>
-                <p className="text-sm text-slate-500">{p.desc}</p>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{p.name}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{p.desc}</p>
                 <div className="my-4">
-                  <span className="text-4xl font-bold text-slate-900">{p.price}</span>
-                  <span className="text-sm text-slate-500">{p.period}</span>
+                  <span className="text-4xl font-bold text-slate-900 dark:text-slate-100">{p.price}</span>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">{p.period}</span>
                 </div>
                 <ul className="mb-6 space-y-2">
                   {p.features.map((f, j) => (
-                    <li key={j} className="flex items-start gap-2 text-sm text-slate-600">
+                    <li key={j} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
                       <span className="mt-0.5 text-emerald-500">✓</span>
                       {f}
                     </li>
@@ -291,7 +297,7 @@ export default function LandingPage() {
                   className={`block w-full rounded-lg py-2.5 text-center text-sm font-semibold transition ${
                     p.highlight
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
+                      : 'border border-slate-300 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800'
                   }`}
                 >
                   {p.cta}
@@ -352,11 +358,11 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-8">
+      <footer className="border-t border-slate-200 bg-white py-8 dark:border-slate-800 dark:bg-slate-950">
         <div className="mx-auto max-w-6xl px-4 text-center text-sm text-slate-400">
           <div className="mb-2 flex items-center justify-center gap-2">
             <span className="text-lg">⛪</span>
-            <span className="font-semibold text-slate-600">IgrejaBot</span>
+            <span className="font-semibold text-slate-600 dark:text-slate-300">IgrejaBot</span>
           </div>
           <p>Assistente inteligente para igrejas. Feito no Brasil.</p>
         </div>
