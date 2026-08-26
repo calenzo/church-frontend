@@ -202,4 +202,16 @@ export const api = {
     request(`/membros/lembretes${qs({ church_id: churchId, limit })}`),
   testBirthdayReminder: (churchId) =>
     request(`/membros/lembretes/teste${qs({ church_id: churchId })}`, { method: "POST" }),
+  getSafetyStatus: (churchId) => request(`/safety${qs({ church_id: churchId })}`),
+  pauseSafety: (churchId) =>
+    request(`/safety/pausar${qs({ church_id: churchId })}`, { method: "POST" }),
+  resumeSafety: (churchId) =>
+    request(`/safety/retomar${qs({ church_id: churchId })}`, { method: "POST" }),
+  updateSafetyLimits: (churchId, data) =>
+    request(`/safety/limites${qs({ church_id: churchId })}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  getSafetyLogs: (churchId, limit = 50) =>
+    request(`/safety/logs${qs({ church_id: churchId, limit })}`),
 };
