@@ -104,7 +104,7 @@ export default function AuthorizedUsersPanel({ churchId }) {
   // ── Área de teste do WhatsApp ─────────────────────────────────────
   const loadWhatsappLogs = useCallback(async () => {
     try {
-      setWaLogs(await api.getWhatsappSendLogs(churchId, 30, 'teste'))
+      setWaLogs(await api.getWhatsappSendLogs(churchId, 30, 'painel'))
     } catch (e) {
       setErr(e.message)
     }

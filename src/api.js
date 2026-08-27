@@ -243,6 +243,6 @@ export const api = {
       method: "POST",
       body: JSON.stringify(data),
     }),
-  getWhatsappSendLogs: (churchId, limit = 30, origin = "teste") =>
+  getWhatsappSendLogs: (churchId, limit = 30, origin = "painel") =>
     request(`/whatsapp/logs${qs({ church_id: churchId, limit, origin })}`),
 };
