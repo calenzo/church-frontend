@@ -233,4 +233,16 @@ export const api = {
     request(`/authorized/actions${qs({ church_id: churchId, limit })}`),
   getAuthorizedProfiles: () => request("/authorized/profiles"),
   getAuthorizedPermissions: () => request("/authorized/permissions"),
+
+  // Área de teste de envio do WhatsApp (aba Autorizados)
+  getWhatsappStatus: (churchId) => request(`/whatsapp/status${qs({ church_id: churchId })}`),
+  getWhatsappGroups: (refresh = false, churchId) =>
+    request(`/whatsapp/grupos${qs({ refresh, church_id: churchId })}`),
+  sendWhatsappToGroup: (data, churchId) =>
+    request(`/whatsapp/enviar-grupo${qs({ church_id: churchId })}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  getWhatsappSendLogs: (churchId, limit = 30, origin = "teste") =>
+    request(`/whatsapp/logs${qs({ church_id: churchId, limit, origin })}`),
 };

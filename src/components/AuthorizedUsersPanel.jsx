@@ -22,6 +22,16 @@ export default function AuthorizedUsersPanel({ churchId }) {
   const [showForm, setShowForm] = useState(false)
   const [tab, setTab] = useState('users')
   const [confirmDelete, setConfirmDelete] = useState(null)
+  const [waStatus, setWaStatus] = useState(null)
+  const [waGroups, setWaGroups] = useState([])
+  const [waLogs, setWaLogs] = useState([])
+  const [waTestMsg, setWaTestMsg] = useState('')
+  const [waGroupId, setWaGroupId] = useState('')
+  const [waGroupName, setWaGroupName] = useState('')
+  const [waGroupsLoading, setWaGroupsLoading] = useState(false)
+  const [waStatusLoading, setWaStatusLoading] = useState(false)
+  const [waSending, setWaSending] = useState(false)
+  const [waResult, setWaResult] = useState(null)
 
   const load = useCallback(async () => {
     try {
@@ -91,6 +101,78 @@ export default function AuthorizedUsersPanel({ churchId }) {
     setShowForm(true)
   }
 
+  // ── Área de teste do WhatsApp ─────────────────────────────────────
+  const loadWhatsappLogs = useCallback(async () => {
+    try {
+      setWaLogs(await api.getWhatsappSendLogs(churchId, 30, 'teste'))
+    } catch (e) {
+      setErr(e.message)
+    }
+  }, [churchId])
+
+  const loadWhatsappGroups = useCallback(async (refresh = false) => {
+    setWaGroupsLoading(true)
+    try {
+      setWaGroups(await api.getWhatsappGroups(refresh, churchId))
+      setErr(null)
+    } catch (e) {
+      setErr(e.message)
+    } finally {
+      setWaGroupsLoading(false)
+    }
+  }, [churchId])
+
+  const testConnection = async () => {
+    setWaStatusLoading(true)
+    setWaStatus(null)
+    try {
+      setWaStatus(await api.getWhatsappStatus(churchId))
+      setErr(null)
+    } catch (e) {
+      setErr(e.message)
+    } finally {
+      setWaStatusLoading(false)
+    }
+  }
+
+  const runSend = async () => {
+    if (!waGroupId && !waGroupName.trim()) {
+      setErr('Selecione um grupo da lista ou digite o nome do grupo.')
+      return
+    }
+    if (!waTestMsg.trim()) {
+      setErr('Digite a mensagem de teste.')
+      return
+    }
+    setWaSending(true)
+    setWaResult(null)
+    try {
+      const res = await api.sendWhatsappToGroup(
+        {
+          groupId: waGroupId,
+          groupName: waGroupId ? '' : waGroupName.trim(),
+          message: waTestMsg,
+        },
+        churchId,
+      )
+      setWaResult(res)
+      setErr(null)
+      loadWhatsappLogs()
+    } catch (e) {
+      setWaResult({ success: false, status: 'erro', error: e.message })
+    } finally {
+      setWaSending(false)
+    }
+  }
+
+  useEffect(() => {
+    if (tab === 'test') {
+      testConnection()
+      loadWhatsappGroups(false)
+      loadWhatsappLogs()
+    }
+  }, [tab, churchId])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -129,6 +211,7 @@ export default function AuthorizedUsersPanel({ churchId }) {
         {[
           { id: 'users', label: 'Usuários', count: users.length },
           { id: 'actions', label: 'Auditoria', count: actions.length },
+          { id: 'test', label: 'Teste de envio' },
         ].map((t) => (
           <button
             key={t.id}
@@ -368,6 +451,182 @@ export default function AuthorizedUsersPanel({ churchId }) {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* WhatsApp test tab */}
+      {tab === 'test' && (
+        <div className="space-y-6">
+          {/* Conexão */}
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  Testar conexão do WhatsApp
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Verifica o número conectado à Evolution API usada nos envios
+                </p>
+              </div>
+              <button
+                onClick={testConnection}
+                disabled={waStatusLoading}
+                className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              >
+                {waStatusLoading ? 'Testando...' : 'Testar conexão'}
+              </button>
+            </div>
+            {waStatus && (
+              <div className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
+                <div>
+                  <p className="text-xs text-slate-400">Estado</p>
+                  <p className={`font-medium ${waStatus.connected ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                    {waStatus.connected ? 'Conectado' : waStatus.state === 'connecting' ? 'Conectando...' : 'Desconectado'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400">Número conectado</p>
+                  <p className="font-medium text-slate-800 dark:text-slate-200">
+                    {waStatus.phone || (waStatus.connected ? '—' : '—')}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400">Verificado em</p>
+                  <p className="font-medium text-slate-800 dark:text-slate-200">
+                    {waStatus.checked_at ? new Date(waStatus.checked_at).toLocaleTimeString('pt-BR') : '—'}
+                  </p>
+                </div>
+              </div>
+            )}
+            {!waStatus && !waStatusLoading && (
+              <p className="mt-2 text-xs text-slate-400">
+                Clique em &quot;Testar conexão&quot; para verificar o número.
+              </p>
+            )}
+          </div>
+
+          {/* Envio para grupo */}
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+              Testar envio para grupo
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Usa exatamente o mesmo caminho real dos comandos falados
+            </p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                  Grupo (lista real do WhatsApp)
+                </label>
+                <div className="flex gap-1">
+                  <select
+                    value={waGroupId}
+                    onChange={(e) => setWaGroupId(e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  >
+                    <option value="">— selecione um grupo —</option>
+                    {waGroups.map((g) => (
+                      <option key={g.id} value={g.id}>{g.subject || g.id}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => loadWhatsappGroups(true)}
+                    disabled={waGroupsLoading}
+                    className="shrink-0 rounded-lg border border-slate-300 px-2.5 text-xs text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 disabled:opacity-50"
+                    title="Recarregar grupos"
+                  >
+                    {waGroupsLoading ? '...' : '↻'}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                  Ou nome do grupo (procura na lista real)
+                </label>
+                <input
+                  value={waGroupName}
+                  onChange={(e) => setWaGroupName(e.target.value)}
+                  placeholder="Ex.: Contatos da Igreja"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                />
+              </div>
+            </div>
+            <div className="mt-3">
+              <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+                Mensagem
+              </label>
+              <textarea
+                value={waTestMsg}
+                onChange={(e) => setWaTestMsg(e.target.value)}
+                placeholder="Mensagem de teste que será enviada de verdade ao grupo"
+                rows={2}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              />
+            </div>
+            <div className="mt-3 flex items-center gap-3">
+              <button
+                onClick={runSend}
+                disabled={waSending || (waGroupsLoading && !waGroupName.trim())}
+                className="rounded-lg bg-emerald-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+              >
+                {waSending ? 'Enviando...' : 'Enviar mensagem'}
+              </button>
+              {waResult && (
+                <span className={`text-sm font-medium ${
+                  waResult.success ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
+                }`}>
+                  {waResult.success ? 'Mensagem enviada!' : `Falha: ${waResult.error || waResult.status || 'erro'}`}
+                  {waResult.messageId && (
+                    <span className="ml-1 text-xs text-slate-400">({waResult.messageId})</span>
+                  )}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Histórico de testes */}
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+              Histórico de testes
+            </h3>
+            <div className="mt-2 space-y-2">
+              {waLogs.length === 0 && (
+                <p className="py-4 text-center text-xs text-slate-400">
+                  Nenhum teste registrado ainda
+                </p>
+              )}
+              {waLogs.map((lg) => (
+                <div
+                  key={lg.id}
+                  className="rounded-lg border border-slate-200 p-3 dark:border-slate-800"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate text-sm font-medium text-slate-800 dark:text-slate-200">
+                      {lg.group_name}
+                    </span>
+                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${
+                      lg.status === 'enviado'
+                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
+                        : lg.status === 'erro'
+                        ? 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400'
+                        : 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400'
+                    }`}>
+                      {lg.status}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
+                    &quot;{lg.message}&quot;
+                  </p>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] text-slate-400">
+                    <span>{lg.created_at ? new Date(lg.created_at).toLocaleString('pt-BR') : ''}</span>
+                    <span>por {lg.user_name}</span>
+                    {lg.message_id && <span>id: {lg.message_id}</span>}
+                    {lg.error && <span className="text-red-500 dark:text-red-400">{lg.error}</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>
