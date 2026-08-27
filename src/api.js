@@ -214,4 +214,23 @@ export const api = {
     }),
   getSafetyLogs: (churchId, limit = 50) =>
     request(`/safety/logs${qs({ church_id: churchId, limit })}`),
+
+  // Usuários autorizados (Secretária Inteligente)
+  getAuthorizedUsers: (churchId) => request(`/authorized${qs({ church_id: churchId })}`),
+  createAuthorizedUser: (data, churchId) =>
+    request(`/authorized${qs({ church_id: churchId })}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateAuthorizedUser: (id, data, churchId) =>
+    request(`/authorized/${id}${qs({ church_id: churchId })}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  deleteAuthorizedUser: (id, churchId) =>
+    request(`/authorized/${id}${qs({ church_id: churchId })}`, { method: "DELETE" }),
+  getAuthorizedActions: (churchId, limit = 50) =>
+    request(`/authorized/actions${qs({ church_id: churchId, limit })}`),
+  getAuthorizedProfiles: () => request("/authorized/profiles"),
+  getAuthorizedPermissions: () => request("/authorized/permissions"),
 };
