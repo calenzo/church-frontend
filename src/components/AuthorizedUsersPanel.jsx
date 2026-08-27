@@ -150,7 +150,7 @@ export default function AuthorizedUsersPanel({ churchId }) {
       const res = await api.sendWhatsappToGroup(
         {
           groupId: waGroupId,
-          groupName: waGroupId ? '' : waGroupName.trim(),
+          groupName: waGroupName.trim(),
           message: waTestMsg,
         },
         churchId,
@@ -521,7 +521,11 @@ export default function AuthorizedUsersPanel({ churchId }) {
                 <div className="flex gap-1">
                   <select
                     value={waGroupId}
-                    onChange={(e) => setWaGroupId(e.target.value)}
+                    onChange={(e) => {
+                      const chosen = waGroups.find((x) => x.id === e.target.value)
+                      setWaGroupId(e.target.value)
+                      setWaGroupName(chosen ? (chosen.subject || '') : '')
+                    }}
                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                   >
                     <option value="">— selecione um grupo —</option>
@@ -545,7 +549,10 @@ export default function AuthorizedUsersPanel({ churchId }) {
                 </label>
                 <input
                   value={waGroupName}
-                  onChange={(e) => setWaGroupName(e.target.value)}
+                  onChange={(e) => {
+                    setWaGroupName(e.target.value)
+                    setWaGroupId('')
+                  }}
                   placeholder="Ex.: Contatos da Igreja"
                   className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 />
@@ -571,17 +578,23 @@ export default function AuthorizedUsersPanel({ churchId }) {
               >
                 {waSending ? 'Enviando...' : 'Enviar mensagem'}
               </button>
-              {waResult && (
-                <span className={`text-sm font-medium ${
-                  waResult.success ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
-                }`}>
-                  {waResult.success ? 'Mensagem enviada!' : `Falha: ${waResult.error || waResult.status || 'erro'}`}
-                  {waResult.messageId && (
-                    <span className="ml-1 text-xs text-slate-400">({waResult.messageId})</span>
-                  )}
-                </span>
-              )}
+              {waSending && <span className="text-sm text-slate-500">Aguardando o WhatsApp...</span>}
             </div>
+            {waResult && !waSending && (
+              waResult.success ? (
+                <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300">
+                  <p className="font-semibold">✅ Mensagem enviada com sucesso</p>
+                  <p>Grupo: {waResult.groupName}</p>
+                  <p>Horário: {new Date(waResult.timestamp || Date.now()).toLocaleString('pt-BR')}</p>
+                  <p>Message ID: {waResult.messageId || '—'}</p>
+                </div>
+              ) : (
+                <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
+                  <p className="font-semibold">Falha ao enviar</p>
+                  <p className="break-words">Erro: {waResult.error || waResult.status || 'erro desconhecido'}</p>
+                </div>
+              )
+            )}
           </div>
 
           {/* Histórico de testes */}
